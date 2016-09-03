@@ -1,17 +1,10 @@
 open! Core.Std
 open! Async.Std
 
-let get url =
-  Cohttp_async.Client.get url
-  >>| fun (response, body) ->
-  match response.status with
-  | `OK -> Ok body
-  | _   -> Or_error.error_string (Cohttp.Code.string_of_status response.status)
-
 let pool_data id =
   "http://danbooru.donmai.us/pools/" ^ Int.to_string id ^ ".json"
   |> Uri.of_string
-  |> get
+  |> Http.get_json
 ;;
 
 let string_of_body =
@@ -22,11 +15,6 @@ let string_of_body =
     String.concat strings
   | `String s -> Deferred.return s
   | `Strings s -> Deferred.return (String.concat s)
-;;
-
-let json_of_body body =
-  let%map body = string_of_body body in
-  Or_error.try_with (fun () -> Yojson.Basic.from_string body)
 ;;
 
 let read_posts json =
@@ -42,15 +30,14 @@ let read_posts json =
 ;;
 
 let pool_posts id =
-  let json = pool_data id >>=? json_of_body in
-  let%map json = json in
-  Or_error.(json >>= read_posts)
+  let%map data = pool_data id in
+  Or_error.bind data read_posts
 ;;
 
 let post_data id =
   "http://danbooru.donmai.us/posts/" ^ Int.to_string id ^ ".json"
   |> Uri.of_string
-  |> get
+  |> Http.get_json
 ;;
 
 let read_file_url json =
@@ -72,17 +59,14 @@ let basename_of_file_url url =
   | None -> Or_error.error_string "no / in file url"
 
 let download_post id =
-  let%bind post_json = id |> post_data >>=? json_of_body in
+  let%bind post_json = id |> post_data in
   match post_json with
   | Ok json ->
     begin match read_file_url json with
     | Ok file_url ->
       let filename = basename_of_file_url file_url in
       let url = "http://danbooru.donmai.us" ^ file_url |> Uri.of_string in
-      let%bind contents =
-        let string_of_body body = string_of_body body >>| Or_error.return in
-        url |> get >>=? string_of_body
-      in
+      let%bind contents = Http.get url in
       begin match Or_error.both filename contents with
       | Ok (name, contents) -> Writer.with_file name ~f:(fun w -> Writer.write w contents; Writer.close w)
       | Error e -> eprintf !"%{sexp: Error.t}\n" e; Deferred.unit
