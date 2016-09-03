@@ -1,8 +1,8 @@
 open Core.Std
 open Async.Std
 
-let string_of_body body =
-  match body with
+let string_of_body =
+  function
   | `Empty     -> return ""
   | `String s  -> return s
   | `Strings s -> return (String.concat s)
@@ -22,8 +22,7 @@ let get uri =
       [%sexp_of: Cohttp.Code.status_code]
 ;;
 
-let json_of_string string =
-  Or_error.try_with (fun () -> Yojson.Basic.from_string string)
+let json_of_string string = Or_error.try_with (fun () -> Yojson.Basic.from_string string)
 
 let get_json uri =
   let%map body = get uri in

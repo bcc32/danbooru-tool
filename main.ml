@@ -7,16 +7,6 @@ let pool_data id =
   |> Http.get_json
 ;;
 
-let string_of_body =
-  function
-  | `Empty  -> Deferred.return ""
-  | `Pipe r ->
-    let%map strings = Pipe.read_all r >>| Queue.to_list in
-    String.concat strings
-  | `String s -> Deferred.return s
-  | `Strings s -> Deferred.return (String.concat s)
-;;
-
 let read_posts json =
   match json with
   | `Assoc mappings ->
@@ -57,6 +47,7 @@ let basename_of_file_url url =
   |> function
   | Some (_, basename) -> Ok basename
   | None -> Or_error.error_string "no / in file url"
+;;
 
 let download_post id =
   let%bind post_json = id |> post_data in
