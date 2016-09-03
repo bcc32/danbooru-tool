@@ -8,15 +8,10 @@ let pool_data id =
 ;;
 
 let read_posts json =
-  match json with
-  | `Assoc mappings ->
-    List.Assoc.find mappings "post_ids"
-    |> begin function
-    | Some (`String ids) -> String.split ids ~on:' ' |> List.map ~f:Int.of_string |> Or_error.return
-    | Some _ -> Or_error.error_string "[post_ids] value is not a string"
-    | None   -> Or_error.error_string "no [post_ids] field"
-    end
-  | _ -> Or_error.error_string "not a JSON object"
+  let open Or_error.Let_syntax in
+  let%map ids = Json.property_s json ~name:"post_ids" in
+  String.split ids ~on:' '
+  |> List.map ~f:Int.of_string
 ;;
 
 let pool_posts id =
@@ -30,18 +25,6 @@ let post_data id =
   |> Http.get_json
 ;;
 
-let read_file_url json =
-  match json with
-  | `Assoc mappings ->
-    List.Assoc.find mappings "file_url"
-    |> begin function
-    | Some (`String file_url) -> Ok file_url
-    | Some _ -> Or_error.error_string "[file_url] value is not a string"
-    | None   -> Or_error.error_string "no [file_url] field"
-    end
-  | _ -> Or_error.error_string "not a JSON object"
-;;
-
 let basename_of_file_url url =
   String.rsplit2 url ~on:'/'
   |> function
@@ -53,7 +36,7 @@ let download_post id =
   let%bind post_json = id |> post_data in
   match post_json with
   | Ok json ->
-    begin match read_file_url json with
+    begin match Json.property_s json ~name:"file_url" with
     | Ok file_url ->
       let filename = basename_of_file_url file_url in
       let url = "http://danbooru.donmai.us" ^ file_url |> Uri.of_string in
