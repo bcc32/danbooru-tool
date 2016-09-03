@@ -33,7 +33,7 @@ let basename_of_file_url url =
 ;;
 
 let download_post id =
-  let%bind post_json = id |> post_data in
+  let%bind post_json = post_data id in
   match post_json with
   | Ok json ->
     begin match Json.property_s json ~name:"file_url" with
@@ -50,7 +50,7 @@ let download_post id =
   | Error e -> eprintf !"%{sexp: Error.t}\n" e; Deferred.unit
 ;;
 
-let command =
+let pool_command =
   Command.async_or_error' ~summary:"Download a pool of Danbooru posts" begin
     let open Command.Let_syntax in
     let%map_open pool_id = anon ("id" %: int) in
@@ -61,6 +61,23 @@ let command =
       |> Pipe.iter ~f:download_post
       >>| Or_error.return
   end
+;;
+
+let post_command =
+  Command.async' ~summary:"Download Danbooru posts" begin
+    let open Command.Let_syntax in
+    let%map_open (id, ids) = anon ("id" %: int |> non_empty_sequence) in
+    fun () ->
+      List.map (id::ids) ~f:download_post
+      |> Deferred.all_unit
+  end
+;;
+
+let command =
+  Command.group ~summary:"Danbooru download tool"
+    [ "pool", pool_command
+    ; "post", post_command
+    ]
 ;;
 
 let () = Command.run command
