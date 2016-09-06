@@ -8,11 +8,13 @@ type t =
   ; extension : string
   }
   [@@deriving fields]
+;;
 
 let filename_extension filename =
   match filename |> Filename.split_extension |> snd with
   | Some ext -> Ok ext
   | None     -> Or_error.error_s [%message "no extension" (filename : string)]
+;;
 
 let get id =
   let%map json =

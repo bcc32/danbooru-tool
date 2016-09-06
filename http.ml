@@ -3,9 +3,9 @@ open! Async.Std
 
 let string_of_body =
   function
-  | `Empty     -> return ""
-  | `String s  -> return s
-  | `Strings s -> return (String.concat s)
+  | `Empty     -> ""              |> return
+  | `String s  -> s               |> return
+  | `Strings s -> String.concat s |> return
   | `Pipe p    ->
     let%map strings = p |> Pipe.read_all >>| Queue.to_list in
     String.concat strings
@@ -14,7 +14,7 @@ let string_of_body =
 let get uri =
   let%bind response, body = Cohttp_async.Client.get uri in
   match response.status with
-  | `OK -> (string_of_body body) >>| Result.return
+  | `OK -> string_of_body body >>| Result.return
   | _   ->
     Deferred.Or_error.error
       "non-OK status code"
