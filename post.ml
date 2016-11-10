@@ -7,7 +7,7 @@ type t =
   ; md5       : string
   ; extension : string
   }
-  [@@deriving fields]
+[@@deriving fields]
 ;;
 
 let filename_extension filename =
