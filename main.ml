@@ -1,23 +1,6 @@
 open! Core.Std
 open! Async.Std
-
-let pool_data id =
-  "http://danbooru.donmai.us/pools/" ^ Int.to_string id ^ ".json"
-  |> Uri.of_string
-  |> Http.get_json
-;;
-
-let read_posts json =
-  let open Or_error.Let_syntax in
-  let%map ids = Json.property_s json ~name:"post_ids" in
-  String.split ids ~on:' '
-  |> List.map ~f:Int.of_string
-;;
-
-let pool_posts id =
-  let%map data = pool_data id in
-  Or_error.bind data read_posts
-;;
+open! Danbooru
 
 let download_post id ~basename =
   let open Deferred.Or_error.Let_syntax in
@@ -52,8 +35,8 @@ let pool_command =
           fun n -> `Basename (pad n d)
       in
       let open Deferred.Or_error.Let_syntax in
-      let%bind posts = pool_posts pool_id in
-      List.mapi posts ~f:(fun n id -> download_post id ~basename:(basename n))
+      let%bind pool = Pool.get pool_id in
+      List.mapi pool.post_ids ~f:(fun n id -> download_post id ~basename:(basename n))
       |> Deferred.Or_error.all_ignore
   end
 ;;
