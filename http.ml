@@ -12,7 +12,17 @@ let string_of_body =
 ;;
 
 let get uri =
-  let%bind response, body = Cohttp_async.Client.get uri in
+  let headers =
+    Cohttp.Header.(
+      let header = init () in
+      let header =
+        match Option.both !Auth.login !Auth.api_key with
+        | Some (login, key) -> add_authorization header (`Basic (login, key))
+        | None -> header
+      in
+      header)
+  in
+  let%bind response, body = Cohttp_async.Client.get ~headers uri in
   match response.status with
   | `OK -> string_of_body body >>| Result.return
   | _   ->

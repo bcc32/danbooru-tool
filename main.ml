@@ -2,6 +2,9 @@ open! Core.Std
 open! Async.Std
 open! Danbooru
 
+let login_flag = Command.Param.(flag "-login" (optional string) ~doc:"string Danbooru username")
+let api_key_flag = Command.Param.(flag "-api-key" (optional string) ~doc:"string Danbooru API key")
+
 let pool_command =
   Command.async_or_error' ~summary:"Download a pool of Danbooru posts" begin
     let open Command.Let_syntax in
@@ -12,8 +15,12 @@ let pool_command =
     and max_connections =
       flag "-max-connections" (optional_with_default 100 int)
         ~doc:"int maximum number of simultaneous connections (default is 100)"
+    and login   = login_flag
+    and api_key = api_key_flag
     in
     fun () ->
+      Auth.login   := login;
+      Auth.api_key := api_key;
       let open Deferred.Or_error.Let_syntax in
       let%bind pool = Pool.get pool_id in
       Pool.save_all pool ~basename:(if md5 then `Md5 else `Numerical) ~max_connections
@@ -23,8 +30,13 @@ let pool_command =
 let post_command =
   Command.async_or_error' ~summary:"Download Danbooru posts" begin
     let open Command.Let_syntax in
-    let%map_open (id, ids) = anon ("id" %: int |> non_empty_sequence) in
+    let%map_open (id, ids) = anon ("id" %: int |> non_empty_sequence)
+    and login   = login_flag
+    and api_key = api_key_flag
+    in
     fun () ->
+      Auth.login   := login;
+      Auth.api_key := api_key;
       let open Deferred.Or_error.Let_syntax in
       List.map (id::ids) ~f:(fun id ->
         let%bind post = Post.get id in
