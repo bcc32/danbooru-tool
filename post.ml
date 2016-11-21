@@ -7,7 +7,7 @@ type t =
   ; md5       : string
   ; extension : string
   }
-[@@deriving fields]
+[@@deriving fields, sexp]
 ;;
 
 let get id =

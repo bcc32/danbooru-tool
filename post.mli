@@ -7,7 +7,7 @@ type t = private
   ; md5       : string
   ; extension : string
   }
-[@@deriving fields]
+[@@deriving fields, sexp]
 ;;
 
 val get : int -> t Deferred.Or_error.t

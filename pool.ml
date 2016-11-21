@@ -40,24 +40,45 @@ let save_all ?(basename=`Numerical) ?(max_connections=100) t =
     then (String.make len '0' ^ n)
     else (n)
   in
-  let download (n, id) = Deferred.Or_error.(
-    let basename =
-      match basename with
-      | `Md5 -> `Md5
-      | `Numerical -> `Basename (to_string n)
-    in
-    id |> Post.get >>= Post.download ~basename)
-  in
   let throttle =
     Limiter.Throttle.create_exn
       ~concurrent_jobs_target:max_connections
       ~continue_on_error:true
       ()
   in
-  List.mapi t.post_ids ~f:(fun n id ->
-    Limiter.Throttle.enqueue' throttle download (n, id)
+  let get_post id =
+    Limiter.Throttle.enqueue' throttle Post.get id
     >>| function
+    | Raised e -> Or_error.of_exn e
+    | Aborted ->
+      Or_error.error_s [%message
+        "get post aborted"
+          (id : int)
+          ~pool_id:(t.id : int)
+      ]
     | Ok result -> result
-    | Aborted -> Or_error.error_s [%message "job aborted" (n : int) (id : int)]
-    | Raised e -> Or_error.of_exn e)
+  in
+  let save_post n post =
+    let basename =
+      match basename with
+      | `Md5 -> `Md5
+      | `Numerical -> `Basename (to_string n)
+    in
+    Limiter.Throttle.enqueue' throttle (Post.download ~basename) post
+    >>| function
+    | Raised e -> Or_error.of_exn e
+    | Aborted ->
+      Or_error.error_s [%message
+        "save post aborted"
+          (post : Post.t)
+          ~pool_id:(t.id : int)
+      ]
+    | Ok result -> result
+  in
+  List.mapi t.post_ids ~f:(fun n id ->
+    Deferred.Or_error.(
+      id
+      |> get_post
+      >>= save_post n))
   |> Deferred.Or_error.all_ignore
+;;
