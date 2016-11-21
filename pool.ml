@@ -54,8 +54,7 @@ let save_all ?(basename=`Numerical) ?(max_connections=100) t =
       Or_error.error_s [%message
         "get post aborted"
           (id : int)
-          ~pool_id:(t.id : int)
-      ]
+          ~pool_id:(t.id : int)]
     | Ok result -> result
   in
   let save_post n post =
@@ -71,8 +70,7 @@ let save_all ?(basename=`Numerical) ?(max_connections=100) t =
       Or_error.error_s [%message
         "save post aborted"
           (post : Post.t)
-          ~pool_id:(t.id : int)
-      ]
+          ~pool_id:(t.id : int)]
     | Ok result -> result
   in
   List.mapi t.post_ids ~f:(fun n id ->
