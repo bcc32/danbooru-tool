@@ -7,12 +7,16 @@ let pool_command =
     let open Command.Let_syntax in
     let%map_open pool_id = anon ("id" %: int)
     and md5 =
-      flag "-md5" no_arg ~doc:" save to filename with MD5 hash (default is post index)"
+      flag "-md5" no_arg
+        ~doc:" save to filename with MD5 hash (default is post index)"
+    and max_connections =
+      flag "-max-connections" (optional_with_default 100 int)
+        ~doc:"int maximum number of simultaneous connections (default is 100)"
     in
     fun () ->
       let open Deferred.Or_error.Let_syntax in
       let%bind pool = Pool.get pool_id in
-      Pool.save_all pool ~basename:(if md5 then `Md5 else `Numerical)
+      Pool.save_all pool ~basename:(if md5 then `Md5 else `Numerical) ~max_connections
   end
 ;;
 

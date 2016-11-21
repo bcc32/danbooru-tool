@@ -42,7 +42,7 @@ let get id =
   Fields.create ~id ~post_count ~post_ids
 ;;
 
-let save_all ?(basename=`Numerical) t =
+let save_all ?(basename=`Numerical) ?(max_connections=100) t =
   let num_digits = t |> post_count |> Int.to_string |> String.length in
   let to_string n =
     let n = Int.to_string n in
@@ -61,7 +61,7 @@ let save_all ?(basename=`Numerical) t =
   in
   let throttle =
     Limiter.Throttle.create_exn
-      ~concurrent_jobs_target:100
+      ~concurrent_jobs_target:max_connections
       ~continue_on_error:true
       ()
   in
