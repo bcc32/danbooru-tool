@@ -10,12 +10,7 @@ type t =
 ;;
 
 let read_posts json =
-  let post_ids = Or_error.try_with (fun () ->
-    Yojson.Basic.Util.(
-      json
-      |> member "post_ids"
-      |> to_string))
-  in
+  let post_ids = Json.(json |> property ~key:"post_ids" >>= to_string) in
   Or_error.(
     post_ids
     >>| String.split ~on:' '
@@ -32,13 +27,7 @@ let get id =
   let open Or_error.Let_syntax in
   let%bind json = json in
   let%map post_ids = read_posts json
-  and post_count =
-    Or_error.try_with (fun () ->
-      Yojson.Basic.Util.(
-        json
-        |> member "post_count"
-        |> to_int))
-  in
+  and post_count = Json.(json |> property ~key:"post_count" >>= to_int) in
   Fields.create ~id ~post_count ~post_ids
 ;;
 

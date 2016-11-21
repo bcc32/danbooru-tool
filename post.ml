@@ -17,10 +17,9 @@ let get id =
     |> Http.get_json
   in
   let open Or_error.Let_syntax in
-  let open Yojson.Basic.Util in
   let%bind json = json in
-  let%bind md5      = Or_error.try_with (fun () -> member "md5"      json |> to_string)
-  and      file_url = Or_error.try_with (fun () -> member "file_url" json |> to_string) in
+  let%bind md5      = Json.(json |> property ~key:"md5"      >>= to_string)
+  and      file_url = Json.(json |> property ~key:"file_url" >>= to_string) in
   let%map extension =
     match file_url |> Filename.split_extension |> snd with
     | Some ext -> Ok ext
