@@ -10,7 +10,7 @@ type t =
 [@@deriving fields]
 ;;
 
-let filename_extension filename =
+let extension filename =
   match filename |> Filename.split_extension |> snd with
   | Some ext -> Ok ext
   | None     -> Or_error.error_s [%message "no extension" (filename : string)]
@@ -23,11 +23,11 @@ let get id =
     |> Http.get_json
   in
   let open Or_error.Let_syntax in
+  let open Yojson.Basic.Util in
   let%bind json = json in
-  let field name = Json.property_s json ~name in
-  let%bind md5 = field "md5"
-  and file_url = field "file_url" in
-  let%map extension = filename_extension file_url in
+  let%bind md5      = Or_error.try_with (fun () -> member "md5"      json |> to_string)
+  and      file_url = Or_error.try_with (fun () -> member "file_url" json |> to_string) in
+  let%map extension = extension file_url in
   Fields.create ~id ~file_url ~md5 ~extension
 ;;
 

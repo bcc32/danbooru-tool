@@ -9,10 +9,16 @@ type t =
 ;;
 
 let read_posts json =
-  let open Or_error.Let_syntax in
-  let%map ids = Json.property_s json ~name:"post_ids" in
-  String.split ids ~on:' '
-  |> List.map ~f:Int.of_string
+  let post_ids = Or_error.try_with (fun () ->
+    Yojson.Basic.Util.(
+      json
+      |> member "post_ids"
+      |> to_string))
+  in
+  Or_error.(
+    post_ids
+    >>| String.split ~on:' '
+    >>| List.map ~f:Int.of_string)
 ;;
 
 let get id =
