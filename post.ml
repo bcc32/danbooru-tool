@@ -10,12 +10,6 @@ type t =
 [@@deriving fields]
 ;;
 
-let extension filename =
-  match filename |> Filename.split_extension |> snd with
-  | Some ext -> Ok ext
-  | None     -> Or_error.error_s [%message "no extension" (filename : string)]
-;;
-
 let get id =
   let%map json =
     "http://danbooru.donmai.us/posts/" ^ Int.to_string id ^ ".json"
@@ -27,7 +21,11 @@ let get id =
   let%bind json = json in
   let%bind md5      = Or_error.try_with (fun () -> member "md5"      json |> to_string)
   and      file_url = Or_error.try_with (fun () -> member "file_url" json |> to_string) in
-  let%map extension = extension file_url in
+  let%map extension =
+    match file_url |> Filename.split_extension |> snd with
+    | Some ext -> Ok ext
+    | None -> Or_error.error_s [%message "no extension" (file_url : string)]
+  in
   Fields.create ~id ~file_url ~md5 ~extension
 ;;
 
@@ -40,4 +38,13 @@ let save { extension; file_url; id = _; md5 = _ } ~basename =
     |> return
   in
   Http.download url ~filename
+;;
+
+let download t ~basename =
+  let basename =
+    match basename with
+    | `Md5        -> md5 t
+    | `Basename b -> b
+  in
+  save t ~basename
 ;;

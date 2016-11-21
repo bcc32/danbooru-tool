@@ -11,4 +11,4 @@ type t = private
 ;;
 
 val get : int -> t Deferred.Or_error.t
-val save : t -> basename:string -> unit Deferred.Or_error.t
+val download : t -> basename:[ `Md5 | `Basename of string ] -> unit Deferred.Or_error.t
