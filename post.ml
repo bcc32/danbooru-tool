@@ -3,9 +3,9 @@ open! Async.Std
 
 type t =
   { id        : int
+  ; file_ext  : string
   ; file_url  : string
   ; md5       : string
-  ; extension : string
   }
 [@@deriving fields, sexp]
 ;;
@@ -18,18 +18,15 @@ let get id =
   in
   let open Or_error.Let_syntax in
   let%bind json = json in
-  let%bind md5      = Json.(json |> property ~key:"md5"      >>= to_string)
-  and      file_url = Json.(json |> property ~key:"file_url" >>= to_string) in
-  let%map extension =
-    match file_url |> Filename.split_extension |> snd with
-    | Some ext -> Ok ext
-    | None -> Or_error.error_s [%message "no extension" (file_url : string)]
+  let%map md5      = Json.(json |> property ~key:"md5"      >>= to_string)
+  and     file_url = Json.(json |> property ~key:"file_url" >>= to_string)
+  and     file_ext = Json.(json |> property ~key:"file_ext" >>= to_string)
   in
-  Fields.create ~id ~file_url ~md5 ~extension
+  Fields.create ~id ~file_url ~md5 ~file_ext
 ;;
 
-let save { extension; file_url; id = _; md5 = _ } ~basename =
-  let filename = basename ^ "." ^ extension in
+let save { file_ext; file_url; id = _; md5 = _ } ~basename =
+  let filename = basename ^ "." ^ file_ext in
   let open Deferred.Or_error.Let_syntax in
   let%bind url =
     Or_error.try_with (fun () ->

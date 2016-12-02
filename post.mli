@@ -3,9 +3,9 @@ open Async.Std
 
 type t = private
   { id        : int
+  ; file_ext  : string
   ; file_url  : string
   ; md5       : string
-  ; extension : string
   }
 [@@deriving fields, sexp]
 ;;
