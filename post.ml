@@ -12,7 +12,7 @@ type t =
 
 let get id =
   let%map json =
-    "http://danbooru.donmai.us/posts/" ^ Int.to_string id ^ ".json"
+    Danbooru.host ^ "/posts/" ^ Int.to_string id ^ ".json"
     |> Uri.of_string
     |> Http.get_json
   in
@@ -29,8 +29,7 @@ let save { file_ext; file_url; id = _; md5 = _ } ~basename =
   let filename = basename ^ "." ^ file_ext in
   let open Deferred.Or_error.Let_syntax in
   let%bind url =
-    Or_error.try_with (fun () ->
-      "http://danbooru.donmai.us" ^ file_url |> Uri.of_string)
+    Or_error.try_with (fun () -> Danbooru.host ^ file_url |> Uri.of_string)
     |> return
   in
   Http.download url ~filename

@@ -1,6 +1,6 @@
 open! Core.Std
 open! Async.Std
-open! Danbooru
+open! Std
 
 let login_flag   = Command.Param.(flag "-login"   (optional string) ~doc:"string Danbooru username")
 let api_key_flag = Command.Param.(flag "-api-key" (optional string) ~doc:"string Danbooru API key")

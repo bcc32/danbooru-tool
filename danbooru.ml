@@ -1,2 +1,1 @@
-module Pool = Pool
-module Post = Post
+let host = "http://danbooru.donmai.us"
