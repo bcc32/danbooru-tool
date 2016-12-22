@@ -60,7 +60,7 @@ let save_all ?(basename=`Numerical) ?(max_connections=100) t =
   let save_post n post =
     let basename =
       match basename with
-      | `Md5 -> `Md5
+      | `Md5       -> `Md5
       | `Numerical -> `Basename (to_string n)
     in
     Limiter.Throttle.enqueue' throttle (Post.download ~basename) post
@@ -73,10 +73,6 @@ let save_all ?(basename=`Numerical) ?(max_connections=100) t =
           ~pool_id:(t.id : int)]
     | Ok result -> result
   in
-  List.mapi t.post_ids ~f:(fun n id ->
-    Deferred.Or_error.(
-      id
-      |> get_post
-      >>= save_post n))
+  List.mapi t.post_ids ~f:(fun n id -> Deferred.Or_error.(id |> get_post >>= save_post n))
   |> Deferred.Or_error.all_ignore
 ;;
