@@ -22,7 +22,7 @@ let get id =
   and     file_url = Json.(json |> property ~key:"file_url" >>= to_string)
   and     file_ext = Json.(json |> property ~key:"file_ext" >>= to_string)
   in
-  Fields.create ~id ~file_url ~md5 ~file_ext
+  { id; file_url; md5; file_ext }
 ;;
 
 let save { file_ext; file_url; id = _; md5 = _ } ~basename =

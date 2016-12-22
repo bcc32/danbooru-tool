@@ -28,7 +28,7 @@ let get id =
   let%bind json = json in
   let%map post_ids = read_posts json
   and post_count = Json.(json |> property ~key:"post_count" >>= to_int) in
-  Fields.create ~id ~post_count ~post_ids
+  { id; post_count; post_ids }
 ;;
 
 let save_all ?(basename=`Numerical) ?(max_connections=100) t =
