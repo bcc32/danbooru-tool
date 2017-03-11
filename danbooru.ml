@@ -1,1 +1,1 @@
-let host = "http://danbooru.donmai.us"
+let host = "https://danbooru.donmai.us"
