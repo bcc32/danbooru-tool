@@ -10,9 +10,9 @@ type t = private
 ;;
 
 val get : int -> t Deferred.Or_error.t
-(* default is `Numerical *)
+
 val save_all
-  :  ?basename:[ `Md5 | `Numerical ]
+  :  t
+  -> naming_scheme:[ `Md5 | `Sequential ]
   -> max_connections:int
-  -> t
   -> unit Deferred.Or_error.t

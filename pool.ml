@@ -31,31 +31,8 @@ let get id =
   { id; post_count; post_ids }
 ;;
 
-let save_all ?(basename=`Numerical) ~max_connections t =
-  let num_digits = t |> post_count |> Int.to_string |> String.length in
-  let to_string n =
-    let n = Int.to_string n in
-    let len = num_digits - String.length n in
-    if len > 0
-    then (String.make len '0' ^ n)
-    else (n)
-  in
-  let throttle = Rate_limiter.create_exn max_connections in
-  let get_post id =
-    let%map result = Rate_limiter.enqueue' throttle Post.get id in
-    Or_error.tag_arg result "get_post" ()
-      (fun () -> [%message "" ~post_id:(id : int) ~pool_id:(t.id : int)])
-  in
-  let save_post n post =
-    let basename =
-      match basename with
-      | `Md5       -> `Md5
-      | `Numerical -> `Basename (to_string n)
-    in
-    let%map result = Rate_limiter.enqueue' throttle (Post.download ~basename) post in
-    Or_error.tag_arg result "save_post" ()
-      (fun () -> [%message "" ~post_id:(post.id : int) ~pool_id:(t.id : int)])
-  in
-  List.mapi t.post_ids ~f:(fun n id -> Deferred.Or_error.(id |> get_post >>= save_post n))
-  |> Deferred.Or_error.all_ignore
+let save_all t ~naming_scheme ~max_connections =
+  let%map result = Downloader.download_posts t.post_ids ~max_connections ~naming_scheme in
+  Or_error.tag_arg result "Pool.save_all" ()
+    (fun () -> [%message "error downloading pool" ~pool_id:(t.id : int)])
 ;;
