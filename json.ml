@@ -6,14 +6,14 @@ include Or_error.Monad_infix
 
 type t = Yojson.Basic.json
 
-let rec sexp_of_t : t -> Sexp.t =
+let rec sexp_of_t =
   function
-  | `Assoc alist -> List.map alist ~f:(fun (k, v) -> [%sexp ((k : string), (v : t))]) |> List
-  | `Bool b -> [%sexp_of: bool] b
-  | `Float f -> [%sexp_of: float] f
-  | `Int i -> [%sexp_of: int] i
-  | `List ts -> List.map ts ~f:[%sexp_of: t] |> List
-  | `Null -> Atom "null"
+  | `Assoc  a -> [%sexp_of: (string, t) List.Assoc.t] a
+  | `Bool   b -> sexp_of_bool b
+  | `Float  f -> sexp_of_float f
+  | `Int    i -> sexp_of_int i
+  | `List   l -> [%sexp_of: t list] l
+  | `Null     -> Atom "null"
   | `String s -> Atom s
 ;;
 
