@@ -1,5 +1,5 @@
-open! Core.Std
-open! Async.Std
+open! Core
+open! Async
 
 type t =
   { id        : int
@@ -30,7 +30,7 @@ let save { file_ext; file_url; id = _; md5 = _ } ~basename =
   let open Deferred.Or_error.Let_syntax in
   let%bind url =
     Or_error.try_with (fun () -> Danbooru.host ^ file_url |> Uri.of_string)
-    |> return
+    |> Deferred.return
   in
   Http.download url ~filename
 ;;

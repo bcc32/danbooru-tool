@@ -1,5 +1,5 @@
-open! Core.Std
-open! Async.Std
+open! Core
+open! Async
 
 val download : Uri.t -> filename:string -> unit Deferred.Or_error.t
 val get      : Uri.t -> string            Deferred.Or_error.t

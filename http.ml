@@ -1,5 +1,5 @@
-open! Core.Std
-open! Async.Std
+open! Core
+open! Async
 
 let string_of_body =
   function
@@ -36,7 +36,7 @@ let json_of_string string = Or_error.try_with (fun () -> Yojson.Basic.from_strin
 
 let get_json uri =
   let%map body = get uri in
-  Or_error.bind body json_of_string
+  Or_error.bind body ~f:json_of_string
 ;;
 
 let download uri ~filename =

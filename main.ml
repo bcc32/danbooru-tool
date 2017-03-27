@@ -1,6 +1,6 @@
-open! Core.Std
-open! Async.Std
-open! Std
+open! Core
+open! Async
+open! Danbooru_tool
 
 let login_flag   = Command.Param.(flag "-login"   (optional string) ~doc:"string Danbooru username")
 let api_key_flag = Command.Param.(flag "-api-key" (optional string) ~doc:"string Danbooru API key")
@@ -30,7 +30,7 @@ let pool_command =
 let post_command =
   Command.async_or_error' ~summary:"Download Danbooru posts" begin
     let open Command.Let_syntax in
-    let%map_open (id, ids) = anon ("id" %: int |> non_empty_sequence)
+    let%map_open ids = anon ("id" %: int |> non_empty_sequence_as_list)
     and login   = login_flag
     and api_key = api_key_flag
     in
@@ -38,7 +38,7 @@ let post_command =
       Auth.login   := login;
       Auth.api_key := api_key;
       let open Deferred.Or_error.Let_syntax in
-      List.map (id::ids) ~f:(fun id ->
+      List.map ids ~f:(fun id ->
         let%bind post = Post.get id in
         Post.download post ~basename:`Md5)
       |> Deferred.Or_error.all_ignore
