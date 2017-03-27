@@ -16,6 +16,7 @@ let get id =
     |> Uri.of_string
     |> Http.get_json
   in
+  let json = Or_error.tag_arg json "post_id" id [%sexp_of: int] in
   let open Or_error.Let_syntax in
   let%bind json = json in
   let%map md5      = Json.(json |> property ~key:"md5"      >>= to_string)

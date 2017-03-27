@@ -28,8 +28,8 @@ let get uri =
   | _   ->
     Deferred.Or_error.error
       "non-OK status code"
-      response.status
-      [%sexp_of: Cohttp.Code.status_code]
+      (response.status, Uri.to_string uri)
+      [%sexp_of: Cohttp.Code.status_code * string]
 ;;
 
 let json_of_string string = Or_error.try_with (fun () -> Yojson.Basic.from_string string)
