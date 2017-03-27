@@ -1,2 +1,7 @@
-val login   : string option ref
-val api_key : string option ref
+type t =
+  { login   : string
+  ; api_key : string
+  }
+;;
+
+val t : t option ref

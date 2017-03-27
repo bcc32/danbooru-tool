@@ -16,8 +16,8 @@ let get uri =
     Cohttp.Header.(
       let header = init () in
       let header =
-        match Option.both !Auth.login !Auth.api_key with
-        | Some (login, key) -> add_authorization header (`Basic (login, key))
+        match !Auth.t with
+        | Some { login; api_key } -> add_authorization header (`Basic (login, api_key))
         | None -> header
       in
       header)
