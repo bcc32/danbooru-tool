@@ -31,7 +31,7 @@ let get id =
   { id; post_count; post_ids }
 ;;
 
-let save_all ?(basename=`Numerical) ?(max_connections=100) t =
+let save_all ?(basename=`Numerical) ~max_connections t =
   let num_digits = t |> post_count |> Int.to_string |> String.length in
   let to_string n =
     let n = Int.to_string n in

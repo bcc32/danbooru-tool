@@ -10,8 +10,8 @@ let pool_command =
       flag "-md5" no_arg
         ~doc:" save to filename with MD5 hash (default is post index)"
     and max_connections =
-      flag "-max-connections" (optional_with_default 100 int)
-        ~doc:"int maximum number of simultaneous connections (default is 100)"
+      flag "-max-connections" (optional_with_default 5 int)
+        ~doc:"int maximum number of simultaneous connections (default is 5)"
     and () = Auth.param
     in
     fun () ->
