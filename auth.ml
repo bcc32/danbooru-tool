@@ -23,3 +23,9 @@ let param =
       |> Option.iter ~f:set_t
     ))
 ;;
+
+let () =
+  Sys.getenv "AUTH"
+  |> Option.bind ~f:(String.lsplit2 ~on:':')
+  |> Option.iter ~f:set_t
+;;
