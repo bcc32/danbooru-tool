@@ -1,3 +1,11 @@
 .DS_Store
 _build
-*.native
+
+# Jenga artifacts
+.merlin
+.findlib-packages
+.jenga
+.ocaml-bin
+.omake-ocaml-bin
+.opam-bin
+*.install
