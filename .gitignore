@@ -1,5 +1,4 @@
 .DS_Store
-_build
 
 # Jenga artifacts
 .merlin
@@ -9,3 +8,7 @@ _build
 .omake-ocaml-bin
 .opam-bin
 *.install
+
+# Build
+_build
+*.native
