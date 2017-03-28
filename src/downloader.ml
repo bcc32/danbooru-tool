@@ -3,12 +3,14 @@ open! Async
 
 let download id ~throttle ~basename =
   let get_post () =
-    let%map post = Rate_limiter.enqueue' throttle Post.get id in
+    let%map post = Rate_limiter.enqueue' throttle (fun () -> Post.get id) in
     Or_error.tag_arg post "download" ()
       (fun () -> [%message "error getting post data" ~post_id:(id : int)])
   in
   let save_post post =
-    let%map result = Rate_limiter.enqueue' throttle (Post.download ~basename) post in
+    let%map result =
+      Rate_limiter.enqueue' throttle (fun () -> Post.download post ~basename)
+    in
     Or_error.tag_arg result "download" ()
       (fun () -> [%message "error downloading image" ~post_id:(id : int)])
   in
