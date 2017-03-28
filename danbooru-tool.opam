@@ -2,4 +2,6 @@ opam-version: "1.2"
 name: "danbooru-tool"
 version: "0.1"
 maintainer: "Aaron L. Zeng <a2z@mit.edu>"
-author: "Aaron L. Zeng <a2z@mit.edu>"
+authors: [ "Aaron L. Zeng <a2z@mit.edu>" ]
+build: [ "jbuilder" "build" "@install" ]
+depends: [ "core" "async" "async_ssl" "cohttp" "yojson" ]
