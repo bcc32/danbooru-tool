@@ -7,7 +7,6 @@ type t = private
   ; post_ids   : int list
   }
 [@@deriving fields]
-;;
 
 val get : int -> t Deferred.Or_error.t
 
