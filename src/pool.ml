@@ -31,8 +31,8 @@ let get id =
   { id; post_count; post_ids }
 ;;
 
-let save_all t ~naming_scheme ~max_connections =
-  let%map result = Downloader.download_posts t.post_ids ~max_connections ~naming_scheme in
+let save_all t ~naming_scheme =
+  let%map result = Downloader.download_posts t.post_ids ~naming_scheme in
   Or_error.tag_arg result "Pool.save_all" ()
     (fun () -> [%message "error downloading pool" ~pool_id:(t.id : int)])
 ;;

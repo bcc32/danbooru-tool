@@ -13,5 +13,4 @@ val get : int -> t Deferred.Or_error.t
 val save_all
   :  t
   -> naming_scheme:[ `Md5 | `Sequential ]
-  -> max_connections:int
   -> unit Deferred.Or_error.t

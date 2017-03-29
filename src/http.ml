@@ -22,9 +22,12 @@ let get uri =
       in
       header)
   in
-  let%bind response, body = Cohttp_async.Client.get ~headers uri in
+  let open Deferred.Or_error.Let_syntax in
+  let%bind response, body =
+    Rate_limiter.(enqueue (t ()) (fun () -> Cohttp_async.Client.get ~headers uri))
+  in
   match response.status with
-  | `OK -> string_of_body body >>| Result.return
+  | `OK -> string_of_body body |> Deferred.map ~f:Or_error.return
   | _   ->
     Deferred.Or_error.error
       "non-OK status code"
