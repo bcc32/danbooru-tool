@@ -25,7 +25,7 @@ let param =
 ;;
 
 let () =
-  Sys.getenv "AUTH"
+  Sys.getenv "DANBOORU_AUTH"
   |> Option.bind ~f:(String.lsplit2 ~on:':')
   |> Option.iter ~f:set_t
 ;;
