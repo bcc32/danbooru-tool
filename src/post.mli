@@ -11,3 +11,7 @@ type t = private
 
 val get : int -> t Deferred.Or_error.t
 val download : t -> basename:[ `Md5 | `Basename of string ] -> unit Deferred.Or_error.t
+
+val search
+  :  tags : string list
+  -> t list Deferred.Or_error.t

@@ -37,10 +37,29 @@ let post_command =
   end
 ;;
 
+let tags_command =
+  Command.async_or_error' ~summary:"Download Danbooru posts" begin
+    let open Command.Let_syntax in
+    let%map_open tags = anon ("tag" %: string |> sequence)
+    and max_connections = max_connections_flag
+    and () = Auth.param
+    in
+    fun () ->
+      (* allow user to enter mutliple tags in single arg with spaces *)
+      let tags = List.concat_map tags ~f:(String.split ~on:' ') in
+      let open Deferred.Or_error.Let_syntax in
+      Post.search ~tags
+      |> Deferred.Or_error.bind ~f:(fun posts ->
+        List.map posts ~f:(Post.download ~basename:`Md5)
+        |> Deferred.Or_error.all_ignore
+      )
+  end
+
 let command =
   Command.group ~summary:"Danbooru download tool"
     [ "pool", pool_command
     ; "post", post_command
+    ; "tags", tags_command
     ]
 ;;
 

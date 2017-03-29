@@ -27,3 +27,4 @@ let wrap f = fun t -> Or_error.try_with (fun () -> f t)
 
 let to_int    = wrap to_int
 let to_string = wrap to_string
+let to_list   = wrap to_list
