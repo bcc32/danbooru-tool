@@ -29,10 +29,12 @@ let get uri =
   match response.status with
   | `OK -> string_of_body body |> Deferred.map ~f:Or_error.return
   | _   ->
-    Deferred.Or_error.error
-      "non-OK status code"
-      (response.status, Uri.to_string uri)
-      [%sexp_of: Cohttp.Code.status_code * string]
+    Deferred.Or_error.error_s
+      [%message
+        "non-OK status code"
+          ~status_code:(response.status : Cohttp.Code.status_code)
+          ~uri:(Uri.to_string uri : string)
+      ]
 ;;
 
 let json_of_string string = Or_error.try_with (fun () -> Yojson.Basic.from_string string)
