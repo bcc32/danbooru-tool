@@ -12,12 +12,11 @@ let get uri =
       in
       header)
   in
-  let open Deferred.Or_error.Let_syntax in
   let%bind response, body =
     Rate_limiter.(enqueue (t ()) (fun () -> Cohttp_async.Client.get ~headers uri))
   in
   match response.status with
-  | `OK -> Cohttp_async.Body.to_string body |> Deferred.map ~f:Or_error.return
+  | `OK -> Cohttp_async.Body.to_string body >>| Or_error.return
   | _   ->
     Deferred.Or_error.error_s
       [%message

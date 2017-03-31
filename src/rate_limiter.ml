@@ -25,6 +25,4 @@ let t =
   fun () -> force t
 ;;
 
-let enqueue' t f = Throttle.enqueue t f
-
-let enqueue t f = enqueue' t (fun () -> f () >>| Or_error.return)
+let enqueue = Throttle.enqueue
