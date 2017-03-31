@@ -1,16 +1,6 @@
 open! Core
 open! Async
 
-let string_of_body =
-  function
-  | `Empty     -> ""              |> return
-  | `String s  -> s               |> return
-  | `Strings s -> String.concat s |> return
-  | `Pipe p    ->
-    let%map strings = p |> Pipe.read_all >>| Queue.to_list in
-    String.concat strings
-;;
-
 let get uri =
   let headers =
     Cohttp.Header.(
@@ -27,7 +17,7 @@ let get uri =
     Rate_limiter.(enqueue (t ()) (fun () -> Cohttp_async.Client.get ~headers uri))
   in
   match response.status with
-  | `OK -> string_of_body body |> Deferred.map ~f:Or_error.return
+  | `OK -> Cohttp_async.Body.to_string body |> Deferred.map ~f:Or_error.return
   | _   ->
     Deferred.Or_error.error_s
       [%message
