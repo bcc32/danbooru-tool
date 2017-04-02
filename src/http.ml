@@ -15,15 +15,16 @@ let get uri =
   let%bind response, body =
     Rate_limiter.(enqueue (t ()) (fun () -> Cohttp_async.Client.get ~headers uri))
   in
-  match response.status with
-  | `OK -> Cohttp_async.Body.to_string body >>| Or_error.return
-  | _   ->
+  if Cohttp.Code.(is_success (code_of_status response.status))
+  then (Cohttp_async.Body.to_string body >>| Or_error.return)
+  else begin
     Deferred.Or_error.error_s
       [%message
         "non-OK status code"
           ~status_code:(response.status : Cohttp.Code.status_code)
           ~uri:(Uri.to_string uri : string)
       ]
+  end
 ;;
 
 let json_of_string string = Or_error.try_with (fun () -> Yojson.Basic.from_string string)
