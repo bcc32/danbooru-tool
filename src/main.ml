@@ -3,7 +3,7 @@ open! Async
 open! Danbooru_tool
 
 let pool_command =
-  Command.async_or_error' ~summary:"Download a pool of Danbooru posts" begin
+  Command.async_or_error' ~summary:"download a pool of Danbooru posts" begin
     let open Command.Let_syntax in
     let%map_open pool_id = anon ("id" %: int)
     and md5 =
@@ -20,7 +20,7 @@ let pool_command =
 ;;
 
 let post_command =
-  Command.async_or_error' ~summary:"Download Danbooru posts by ID" begin
+  Command.async_or_error' ~summary:"download Danbooru posts by ID" begin
     let open Command.Let_syntax in
     let%map_open ids = anon ("id" %: int |> non_empty_sequence_as_list)
     and () = Auth.param
@@ -31,7 +31,7 @@ let post_command =
 ;;
 
 let tags_command =
-  Command.async_or_error' ~summary:"Download Danbooru posts by tag" begin
+  Command.async_or_error' ~summary:"download Danbooru posts by tag" begin
     let open Command.Let_syntax in
     let%map_open tags = anon ("tag" %: string |> sequence)
     and () = Auth.param
@@ -56,4 +56,7 @@ let command =
     ]
 ;;
 
-let () = Command.run command
+let build_info = "danbooru-tool"
+let version    = "0.1.0"
+
+let () = Command.run command ~build_info ~version
