@@ -2,7 +2,18 @@ open! Core
 open! Async
 open! Danbooru_tool
 
-let global_flags = Command.Param.all_ignore [ Auth.param; Rate_limiter.param ]
+let verbose =
+  let set_level is_verbose =
+    let level = if is_verbose then `Info else `Error in
+    Log.Global.set_level level
+  in
+  Command.Param.(
+    flag "-verbose" no_arg ~doc:" increase log output"
+    |> map ~f:set_level
+  )
+;;
+
+let global_flags = Command.Param.all_ignore [ Auth.param; Rate_limiter.param; verbose ]
 
 let command_with_global_flags param =
   let param = Command.Param.(global_flags *> param) in
@@ -58,6 +69,6 @@ let command =
 ;;
 
 let build_info = "danbooru-tool"
-let version    = "0.1.0"
+let version    = "0.1.1"
 
 let () = Command.run command ~build_info ~version
