@@ -40,7 +40,8 @@ let post_command =
   let param =
     let open Command.Let_syntax in
     let%map_open ids = anon ("id" %: int |> non_empty_sequence_as_list) in
-    fun () -> Downloader.download_posts ids ~naming_scheme:`Md5
+    fun () ->
+      Downloader.download_posts ids ~naming_scheme:`Md5
   in
   command_with_global_flags param ~summary:"download Danbooru posts by ID"
 ;;
