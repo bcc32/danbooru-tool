@@ -12,11 +12,7 @@ let download id ~basename =
     Or_error.tag_arg result "download" ()
       (fun () -> [%message "error downloading image" ~post_id:(id : int)])
   in
-  let open Deferred.Or_error.Let_syntax in
-  let%bind post = get_post () in
-  let%map result = save_post post in
-  Log.Global.info "%s %d" post.md5 post.id;
-  result
+  Deferred.Or_error.(get_post () >>= save_post)
 ;;
 
 let download_posts ids ~naming_scheme =

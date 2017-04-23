@@ -46,7 +46,9 @@ let download t ~basename =
     | `Md5        -> md5 t
     | `Basename b -> b
   in
-  save t ~basename
+  let%map result = save t ~basename in
+  Log.Global.info "%s %d" t.md5 t.id;
+  result
 ;;
 
 let page_size = 20
