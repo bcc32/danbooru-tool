@@ -2,18 +2,35 @@ open! Core
 open! Async
 open! Danbooru_tool
 
+let output_dir =
+  Command.Param.(
+    flag "-output-dir" (optional_with_default "." string)
+      ~doc:"dir output directory for downloaded posts, default cwd"
+      ~aliases:[ "-d" ]
+    |> map ~f:(fun d -> Http.output_dir := d)
+  )
+
 let verbose =
   let set_level is_verbose =
     let level = if is_verbose then `Info else `Error in
     Log.Global.set_level level
   in
   Command.Param.(
-    flag "-verbose" no_arg ~doc:" increase log output"
+    flag "-verbose" no_arg
+      ~doc:" increase log output"
+      ~aliases:[ "-v" ]
     |> map ~f:set_level
   )
 ;;
 
-let global_flags = Command.Param.all_ignore [ Auth.param; Rate_limiter.param; verbose ]
+let global_flags =
+  Command.Param.all_ignore
+    [ Auth.param
+    ; Rate_limiter.param
+    ; output_dir
+    ; verbose
+    ]
+;;
 
 let command_with_global_flags param =
   let param = Command.Param.(global_flags *> param) in

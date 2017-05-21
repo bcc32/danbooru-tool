@@ -34,12 +34,15 @@ let get_json uri =
   Or_error.bind body ~f:json_of_string
 ;;
 
+let output_dir = ref "."
+
 let download uri ~filename =
+  let pathname = Filename.concat !output_dir filename in
   let%bind contents = get uri in
   match contents with
   | Error _ as err -> return err
   | Ok c ->
-    Writer.with_file filename ~f:(fun w ->
+    Writer.with_file pathname ~f:(fun w ->
       Writer.write w c;
       Writer.close w >>| Or_error.return)
 ;;
