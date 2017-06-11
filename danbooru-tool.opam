@@ -3,5 +3,5 @@ name: "danbooru-tool"
 version: "0.1.1"
 maintainer: "Aaron L. Zeng <a2z@mit.edu>"
 authors: [ "Aaron L. Zeng <a2z@mit.edu>" ]
-build: [ "jbuilder" "build" "@install" ]
+build: [[ "jbuilder" "build" "-p" name "-j" jobs ]]
 depends: [ "core" "async" "async_ssl" "cohttp" "yojson" ]
