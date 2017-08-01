@@ -7,4 +7,4 @@ homepage: "https://github.com/bcc32/danbooru-tool"
 bug-reports: "https://github.com/bcc32/danbooru-tool/issues"
 dev-repo: "https://github.com/bcc32/danbooru-tool"
 build: ["jbuilder" "build" "-p" name "-j" jobs]
-depends: ["core" "async" "async_ssl" "cohttp" "yojson"]
+depends: ["core" "async" "async_ssl" "cohttp" "cohttp-async" "yojson"]

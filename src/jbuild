@@ -3,7 +3,7 @@
    (preprocess (pps (ppx_jane -annotated-ignores ppx_driver.runner)))
    (libraries (core
                async
-               cohttp.async
+               cohttp-async
                yojson))))
 
 (install
