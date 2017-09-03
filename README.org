@@ -1,18 +1,10 @@
 #+TITLE: danbooru-tool
 
-* Quick Start (jbuilder)
+* Build instructions
 
 #+BEGIN_SRC bash
   # git clone and chdir
   jbuilder build @install
   jbuilder install
   danbooru-tool
-#+END_SRC
-
-* Quick Start (make)
-
-#+BEGIN_SRC bash
-  # git clone and chdir
-  make
-  ./main.native
 #+END_SRC
