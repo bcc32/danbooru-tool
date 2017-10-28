@@ -7,7 +7,10 @@ let output_dir =
     flag "-output-dir" (optional_with_default "." string)
       ~doc:"dir output directory for downloaded posts, default cwd"
       ~aliases:[ "-d" ]
-    |> map ~f:(fun d -> Http.output_dir := d)
+    |> map ~f:(fun d ->
+      Core.Unix.mkdir_p d;
+      Http.output_dir := d
+    )
   )
 
 let verbose =
