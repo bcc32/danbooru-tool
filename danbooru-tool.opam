@@ -1,6 +1,6 @@
 opam-version: "1.2"
 name: "danbooru-tool"
-version: "0.1.1"
+version: "0.1.2"
 maintainer: "Aaron L. Zeng <a2z@mit.edu>"
 authors: "Aaron L. Zeng <a2z@mit.edu>"
 homepage: "https://github.com/bcc32/danbooru-tool"

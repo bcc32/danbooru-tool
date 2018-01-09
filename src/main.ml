@@ -37,7 +37,7 @@ let global_flags =
 
 let command_with_global_flags param =
   let param = Command.Param.(global_flags *> param) in
-  Command.async_or_error' param
+  Command.async_or_error param
 ;;
 
 let pool_command =
@@ -90,6 +90,6 @@ let command =
 ;;
 
 let build_info = "danbooru-tool"
-let version    = "0.1.1"
+let version    = "0.1.2"
 
 let () = Command.run command ~build_info ~version
