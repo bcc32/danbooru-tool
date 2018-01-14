@@ -1,10 +1,20 @@
 #+TITLE: danbooru-tool
 
+Download posts from Danbooru by ID, pool, or tag search.
+
+* Usage
+
+  #+BEGIN_SRC sh
+    danbooru-tool post [-v] [-d output-dir] <id> [<id>...]
+    danbooru-tool pool [-v] [-d output-dir] <id> [-n|-md5]
+    danbooru-tool tags [-v] [-d output-dir] <tag> [<tag>...]
+  #+END_SRC
+
 * Build instructions
 
-#+BEGIN_SRC bash
-  # git clone and chdir
-  jbuilder build @install
-  jbuilder install
-  danbooru-tool
-#+END_SRC
+  #+BEGIN_SRC sh
+    # git clone and chdir
+    jbuilder build
+    jbuilder install
+    danbooru-tool
+  #+END_SRC
