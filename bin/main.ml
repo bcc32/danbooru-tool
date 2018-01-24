@@ -1,6 +1,6 @@
 open! Core
 open! Async
-open Danbooru_tool
+open Danbooru_lib
 
 (* TODO update style *)
 (* TODO migrate to cmdliner *)

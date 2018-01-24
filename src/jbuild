@@ -1,10 +1,10 @@
-(executables
-  ((names (main))
-   (public_names (danbooru-tool))
-   (preprocess (pps (ppx_jane -annotated-ignores ppx_driver.runner)))
-   (libraries (core
-               async
-               cohttp-async
-               yojson))))
-
 (jbuild_version 1)
+
+(library
+ ((name     danbooru_lib)
+  (synopsis "Bindings for Danbooru API")
+  (preprocess (pps (ppx_jane -annotated-ignores ppx_driver.runner)))
+  (libraries (core
+              async
+              cohttp-async
+              yojson))))
