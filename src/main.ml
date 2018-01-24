@@ -2,6 +2,9 @@ open! Core
 open! Async
 open Danbooru_tool
 
+(* TODO update style *)
+(* TODO migrate to cmdliner *)
+
 let output_dir =
   Command.Param.(
     flag "-output-dir" (optional_with_default "." string)
