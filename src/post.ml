@@ -22,8 +22,8 @@ let of_json json =
 
 let get id =
   let%map json =
-    Danbooru.host ^ "/posts/" ^ Int.to_string id ^ ".json"
-    |> Uri.of_string
+    let path = sprintf "/posts/%d.json" id in
+    Danbooru.make_uri () ~path
     |> Http.get_json
   in
   let json = Or_error.tag_arg json "get" () (fun () -> [%message "" ~post_id:(id : int)]) in
@@ -32,12 +32,8 @@ let get id =
 
 let save { file_ext; file_url; id = _; md5 = _ } ~basename =
   let filename = basename ^ "." ^ file_ext in
-  let open Deferred.Or_error.Let_syntax in
-  let%bind url =
-    Or_error.try_with (fun () -> Danbooru.host ^ file_url |> Uri.of_string)
-    |> Deferred.return
-  in
-  Http.download url ~filename
+  let uri = Danbooru.make_uri () ~path:file_url in
+  Http.download uri ~filename
 ;;
 
 let download t ~basename =
@@ -56,8 +52,11 @@ let page_size = 20
 let search ~tags =
   let tags = String.concat tags ~sep:" " in
   let%bind post_count =
-    let uri = Danbooru.host ^ "/counts/posts.json" |> Uri.of_string in
-    let uri = Uri.add_query_param' uri ("tags", tags) in
+    let uri =
+      Danbooru.make_uri ()
+        ~path:"/counts/posts.json"
+        ~query:[ ("tags", [ tags ]) ]
+    in
     let%map json = Http.get_json uri in
     Json.(json >>= property ~key:"counts" >>= property ~key:"posts" >>= to_int)
   in
@@ -66,10 +65,9 @@ let search ~tags =
   | Ok post_count ->
     let page_count = Int.round_up post_count ~to_multiple_of:page_size / page_size in
     let base_uri =
-      let uri = Danbooru.host ^ "/posts.json" |> Uri.of_string in
-      let uri = Uri.add_query_param' uri ("tags", tags) in
-      let uri = Uri.add_query_param' uri ("limit", Int.to_string page_size) in
-      uri
+      Danbooru.make_uri ()
+        ~path:"/posts.json"
+        ~query:[ ("tags", [ tags ]); ("limit", [ Int.to_string page_size ]) ]
     in
     List.range 1 page_count ~stop:`inclusive
     |> List.map ~f:(fun page ->
