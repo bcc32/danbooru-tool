@@ -1,6 +1,6 @@
 open! Core
 open! Async
-open! Danbooru_tool
+open Danbooru_tool
 
 let output_dir =
   Command.Param.(

@@ -1,6 +1,6 @@
 open! Core
 open! Async
-open! Yojson.Basic.Util
+open Yojson.Basic.Util
 
 include Or_error.Monad_infix
 
