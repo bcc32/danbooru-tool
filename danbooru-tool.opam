@@ -5,6 +5,6 @@ maintainer: "Aaron L. Zeng <a2z@mit.edu>"
 authors: "Aaron L. Zeng <a2z@mit.edu>"
 homepage: "https://github.com/bcc32/danbooru-tool"
 bug-reports: "https://github.com/bcc32/danbooru-tool/issues"
-dev-repo: git://github.com/bcc32/danbooru-tool"
+dev-repo: "git://github.com/bcc32/danbooru-tool"
 build: ["jbuilder" "build" "-p" name "-j" jobs]
 depends: ["core" "async" "async_ssl" "cohttp" "cohttp-async" "yojson"]
