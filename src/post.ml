@@ -31,7 +31,7 @@ let get id ~http =
 
 let save { file_ext; file_url; id = _; md5 = _ } ~http ~basename =
   let filename = basename ^ "." ^ file_ext in
-  let uri = Danbooru.make_uri () ~path:file_url in
+  let uri = Danbooru.resolve (Uri.of_string file_url) in
   Http.download http uri ~filename
 ;;
 

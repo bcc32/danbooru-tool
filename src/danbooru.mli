@@ -7,3 +7,5 @@ val make_uri
   -> ?fragment:string
   -> unit
   -> Uri.t
+
+val resolve : Uri.t -> Uri.t
