@@ -17,8 +17,8 @@ let read_posts json =
 
 let get id ~config =
   let json =
-    "http://danbooru.donmai.us/pools/" ^ Int.to_string id ^ ".json"
-    |> Uri.of_string
+    let path = sprintf "/pools/%d.json" id in
+    Danbooru.make_uri () ~path
     |> Http.get_json (Config.http config)
   in
   let%map json = json in
