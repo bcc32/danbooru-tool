@@ -10,9 +10,9 @@ let maybe_mkdirp dir =
 
 let output_dir =
   Arg.info [ "d"; "output-dir" ]
+    ~docs:Manpage.s_common_options
     ~docv:"DIR"
-    ~doc:"Save downloaded image files to directory $(docv) instead of the \
-          current working directory (default)."
+    ~doc:"Save downloaded image files to directory $(docv)."
   |> Arg.(opt string ".")
   |> Arg.value
   |> Term.(app (pure maybe_mkdirp))
@@ -27,7 +27,8 @@ let log_level =
   in
   let flag_count =
     Arg.info [ "v"; "verbose" ]
-      ~doc:"Increase the level of verbosity"
+      ~docs:Manpage.s_common_options
+      ~doc:"Increase the level of verbosity."
     |> Arg.flag_all
     |> Arg.value
   in
@@ -46,6 +47,7 @@ let auth =
   Arg.info [ "auth" ]
     ~env:(Arg.env_var "DANBOORU_AUTH"
             ~doc:"User and API key used to access Danbooru API.")
+    ~docs:Manpage.s_common_options
     ~docv:"USER:API_KEY"
     ~doc:"Set the user and API key used to access the Danbooru API."
   |> Arg.(opt (some auth_conv) None)
@@ -54,8 +56,9 @@ let auth =
 
 let max_concurrent_jobs =
   Arg.info [ "max-connections" ]
+    ~docs:Manpage.s_common_options
     ~docv:"INT"
-    ~doc:"Set the maximum number of simultaneous connections (default 5)"
+    ~doc:"Set the maximum number of simultaneous connections."
   |> Arg.(opt int 5)
   |> Arg.value
 ;;
@@ -94,6 +97,7 @@ let pool_cmd =
   Term.(pure main $ config $ pool_id $ naming_scheme),
   Term.info "pool"
     ~doc:"download a pool of Danbooru posts"
+    ~sdocs:Manpage.s_common_options
 ;;
 
 let post_cmd =
@@ -109,6 +113,7 @@ let post_cmd =
   Term.(pure main $ config $ ids),
   Term.info "post"
     ~doc:"download Danbooru posts by ID"
+    ~sdocs:Manpage.s_common_options
 ;;
 
 let tags_cmd =
@@ -130,14 +135,15 @@ let tags_cmd =
   Term.(pure main $ config $ tags),
   Term.info "tags"
     ~doc:"download Danbooru posts by tag"
+    ~sdocs:Manpage.s_common_options
 ;;
 
 let async_term (async, info) =
   let run async =
     match Thread_safe.block_on_async (fun () -> async) with
-    | Ok (Ok ()) -> `Ok ()
+    | Ok (Ok ())   -> `Ok ()
     | Ok (Error e) -> `Error (false, Error.to_string_hum e)
-    | Error exn -> `Error (false, Exn.to_string exn)
+    | Error exn    -> `Error (false, Exn.to_string exn)
   in
   Term.(ret (pure run $ async)), info
 ;;
@@ -149,8 +155,7 @@ let main_cmd =
   Term.(ret (pure (`Help (`Pager, None)))),
   Term.info name
     ~doc:"Danbooru download tool"
-    ~sdocs:Manpage.s_commands
-    ~exits:Term.default_exits
+    ~sdocs:Manpage.s_common_options
     ~version
 ;;
 
