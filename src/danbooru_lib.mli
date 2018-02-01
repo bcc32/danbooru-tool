@@ -1,4 +1,3 @@
-(* TODO reduce the surface area of this library *)
 module Auth       = Auth
 module Config     = Config
 module Danbooru   = Danbooru
@@ -8,8 +7,12 @@ module Pool       = Pool
 module Tags       = Tags
 
 (* Version of Post for export *)
-module Post = struct
+module Post : sig
   type t = Post.t
 
-  let download t ~config = Post.download t ~http:(Config.http config)
+  val download
+    :  t
+    -> config : Config.t
+    -> basename : [ `Md5 | `Basename of string ]
+    -> unit Async.Deferred.Or_error.t
 end

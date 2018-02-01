@@ -8,9 +8,13 @@ type t = private
   }
 [@@deriving fields]
 
-val get : int -> t Deferred.Or_error.t
+val get
+  :  int
+  -> config : Config.t
+  -> t Deferred.Or_error.t
 
 val save_all
   :  t
-  -> naming_scheme:[ `Md5 | `Sequential ]
+  -> config        : Config.t
+  -> naming_scheme : [ `Md5 | `Sequential ]
   -> unit Deferred.Or_error.t

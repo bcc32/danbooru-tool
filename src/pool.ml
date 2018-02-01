@@ -7,7 +7,6 @@ type t =
   ; post_ids   : int list
   }
 [@@deriving fields]
-;;
 
 let read_posts json =
   let post_ids = Json.(json |> property ~key:"post_ids" >>= to_string) in
@@ -17,11 +16,11 @@ let read_posts json =
     >>| List.map ~f:Int.of_string)
 ;;
 
-let get id =
+let get id ~config =
   let json =
     "http://danbooru.donmai.us/pools/" ^ Int.to_string id ^ ".json"
     |> Uri.of_string
-    |> Http.get_json
+    |> Http.get_json (Config.http config)
   in
   let%map json = json in
   let open Or_error.Let_syntax in
@@ -31,8 +30,12 @@ let get id =
   { id; post_count; post_ids }
 ;;
 
-let save_all t ~naming_scheme =
-  let%map result = Downloader.download_posts t.post_ids ~naming_scheme in
+let save_all t ~config ~naming_scheme =
+  let%map result =
+    Downloader.download_posts (Config.downloader config)
+      t.post_ids
+      ~naming_scheme
+  in
   Or_error.tag_arg result "Pool.save_all" ()
     (fun () -> [%message "error downloading pool" ~pool_id:(t.id : int)])
 ;;

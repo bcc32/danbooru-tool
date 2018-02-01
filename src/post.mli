@@ -7,11 +7,17 @@ type t = private
   ; file_url  : string
   ; md5       : string
   }
-[@@deriving fields, sexp]
+[@@deriving sexp]
 
-val get : int -> t Deferred.Or_error.t
-val download : t -> basename:[ `Md5 | `Basename of string ] -> unit Deferred.Or_error.t
+val of_json : Json.t -> t Or_error.t
 
-val search
-  :  tags : string list
-  -> t list Deferred.Or_error.t
+val get
+  :  int
+  -> http : Http.t
+  -> t Deferred.Or_error.t
+
+val download
+  :  t
+  -> http     : Http.t
+  -> basename : [ `Md5 | `Basename of string ]
+  -> unit Deferred.Or_error.t
