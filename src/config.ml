@@ -8,7 +8,6 @@ type t =
   ; rate_limiter : Rate_limiter.t
   ; http         : Http.t
   ; downloader   : Downloader.t }
-[@@deriving fields]
 
 let create ~output_dir ~log_level ~auth ~max_concurrent_jobs =
   let log =

@@ -68,7 +68,9 @@ let config =
   Term.(pure make_config $ output_dir $ log_level $ auth $ max_concurrent_jobs)
 ;;
 
-let pool_cmd =
+type async_cmd = unit Deferred.Or_error.t Term.t * Term.info
+
+let pool_cmd : async_cmd =
   let pool_id =
     Arg.info []
       ~docv:"ID"
@@ -94,15 +96,15 @@ let pool_cmd =
     ~sdocs:Manpage.s_common_options
 ;;
 
-let post_cmd =
+let post_cmd : async_cmd =
   let ids =
     Arg.info []
       ~docv:"ID"
     |> Arg.(pos_all int [])
     |> Arg.non_empty
   in
-  let main config ids =
-    Downloader.download_posts (Config.downloader config) ids ~naming_scheme:`Md5
+  let main (config : Config.t) ids =
+    Downloader.download_posts config.downloader ids ~naming_scheme:`Md5
   in
   Term.(pure main $ config $ ids),
   Term.info "post"
@@ -110,7 +112,7 @@ let post_cmd =
     ~sdocs:Manpage.s_common_options
 ;;
 
-let tags_cmd =
+let tags_cmd : async_cmd =
   let tags =
     (* allow user to enter multiple tags in single arg with spaces *)
     let normalize tags = List.concat_map tags ~f:(String.split ~on:' ') in
@@ -132,7 +134,7 @@ let tags_cmd =
     ~sdocs:Manpage.s_common_options
 ;;
 
-let async_term async =
+let async_cmd async =
   let run async =
     match Thread_safe.block_on_async (fun () -> async) with
     | Ok (Ok ())   -> `Ok ()
@@ -157,7 +159,7 @@ let () =
   [ pool_cmd
   ; post_cmd
   ; tags_cmd ]
-  |> List.map ~f:(Tuple2.map_fst ~f:async_term)
+  |> List.map ~f:(Tuple2.map_fst ~f:async_cmd)
   |> Term.eval_choice main_cmd
   |> Term.exit
 ;;

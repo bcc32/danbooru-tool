@@ -8,7 +8,6 @@ type t = private
   ; rate_limiter : Rate_limiter.t
   ; http         : Http.t
   ; downloader   : Downloader.t }
-[@@deriving fields]
 
 val create
   :  output_dir          : string

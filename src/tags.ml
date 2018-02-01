@@ -3,8 +3,8 @@ open! Async
 
 let page_size = 20
 
-let search ~config tags =
-  let http = Config.http config in
+let search ~(config : Config.t) tags =
+  let http = config.http in
   let tags = String.concat tags ~sep:" " in
   let%bind post_count =
     let uri =
