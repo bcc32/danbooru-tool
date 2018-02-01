@@ -95,7 +95,7 @@ let pool_cmd : async_cmd =
     ~doc:"download a pool of Danbooru posts"
     ~sdocs:Manpage.s_common_options
     ~man:[ `S Manpage.s_authors
-         ; `P "%%AUTHORS%%" ]
+         ; `P "%%PKG_AUTHORS%%" ]
 ;;
 
 let post_cmd : async_cmd =
@@ -113,7 +113,7 @@ let post_cmd : async_cmd =
     ~doc:"download Danbooru posts by ID"
     ~sdocs:Manpage.s_common_options
     ~man:[ `S Manpage.s_authors
-         ; `P "%%AUTHORS%%" ]
+         ; `P "%%PKG_AUTHORS%%" ]
 ;;
 
 let tags_cmd : async_cmd =
@@ -137,7 +137,7 @@ let tags_cmd : async_cmd =
     ~doc:"download Danbooru posts by tag"
     ~sdocs:Manpage.s_common_options
     ~man:[ `S Manpage.s_authors
-         ; `P "%%AUTHORS%%" ]
+         ; `P "%%PKG_AUTHORS%%" ]
 ;;
 
 let async_cmd async =
@@ -160,7 +160,7 @@ let main_cmd =
     ~sdocs:Manpage.s_common_options
     ~version
     ~man:[ `S Manpage.s_authors
-         ; `P "%%AUTHORS%%" ]
+         ; `P "%%PKG_AUTHORS%%" ]
 ;;
 
 let () =
