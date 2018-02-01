@@ -94,6 +94,8 @@ let pool_cmd : async_cmd =
   Term.info "pool"
     ~doc:"download a pool of Danbooru posts"
     ~sdocs:Manpage.s_common_options
+    ~man:[ `S Manpage.s_authors
+         ; `P "%%AUTHORS%%" ]
 ;;
 
 let post_cmd : async_cmd =
@@ -110,6 +112,8 @@ let post_cmd : async_cmd =
   Term.info "post"
     ~doc:"download Danbooru posts by ID"
     ~sdocs:Manpage.s_common_options
+    ~man:[ `S Manpage.s_authors
+         ; `P "%%AUTHORS%%" ]
 ;;
 
 let tags_cmd : async_cmd =
@@ -132,6 +136,8 @@ let tags_cmd : async_cmd =
   Term.info "tags"
     ~doc:"download Danbooru posts by tag"
     ~sdocs:Manpage.s_common_options
+    ~man:[ `S Manpage.s_authors
+         ; `P "%%AUTHORS%%" ]
 ;;
 
 let async_cmd async =
@@ -144,7 +150,7 @@ let async_cmd async =
   Term.(ret (pure run $ async))
 ;;
 
-let name    = "danbooru-tool"
+let name    = "%%NAME%%"
 let version = "%%VERSION%%"
 
 let main_cmd =
@@ -153,6 +159,8 @@ let main_cmd =
     ~doc:"Danbooru download tool"
     ~sdocs:Manpage.s_common_options
     ~version
+    ~man:[ `S Manpage.s_authors
+         ; `P "%%AUTHORS%%" ]
 ;;
 
 let () =
