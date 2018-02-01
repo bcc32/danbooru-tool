@@ -3,11 +3,6 @@ open! Async
 open Cmdliner
 open Danbooru_lib
 
-let maybe_mkdirp dir =
-  Core.Unix.mkdir_p dir;
-  dir
-;;
-
 let output_dir =
   Arg.info [ "d"; "output-dir" ]
     ~docs:Manpage.s_common_options
@@ -15,7 +10,6 @@ let output_dir =
     ~doc:"Save downloaded image files to directory $(docv)."
   |> Arg.(opt string ".")
   |> Arg.value
-  |> Term.(app (pure maybe_mkdirp))
 ;;
 
 let log_level =

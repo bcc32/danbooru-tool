@@ -2,10 +2,20 @@ open! Core
 open! Async
 
 type t =
-  { output_dir   : string
-  ; auth         : Auth.t option
-  ; rate_limiter : Rate_limiter.t }
-[@@deriving fields]
+  { auth         : Auth.t option
+  ; rate_limiter : Rate_limiter.t
+  ; output_dir   : string Deferred.t
+  }
+
+let create ?auth ~output_dir ~rate_limiter () =
+  let output_dir =
+    let%map () = Unix.mkdir ~p:() output_dir in
+    output_dir
+  in
+  { auth
+  ; rate_limiter
+  ; output_dir }
+;;
 
 let get_body t uri =
   let headers =
@@ -50,7 +60,8 @@ let get_pipe t uri =
 ;;
 
 let download t uri ~filename =
-  let path = Filename.concat t.output_dir filename in
+  let%bind output_dir = t.output_dir in
+  let path = Filename.concat output_dir filename in
   let open Deferred.Or_error.Let_syntax in
   let%bind contents = get_pipe t uri in
   Writer.with_file path ~f:(fun w ->
