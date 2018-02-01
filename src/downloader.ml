@@ -6,21 +6,13 @@ type t =
 
 let create http = { http }
 
-(* TODO move error tagging into Post *)
 let download { http } id ~basename =
-  let get_post () =
-    let%map post = Post.get id ~http in
-    Or_error.tag_arg post "download" ()
-      (fun () -> [%message "error getting post data" ~post_id:(id : int)])
-  in
-  let save_post post =
-    let%map result = Post.download post ~http ~basename in
-    Or_error.tag_arg result "download" ()
-      (fun () -> [%message "error downloading image" ~post_id:(id : int)])
-  in
-  Deferred.Or_error.(get_post () >>= save_post)
+  let open Deferred.Or_error.Let_syntax in
+  let%bind post = Post.get id ~http in
+  Post.download post ~http ~basename
 ;;
 
+(* FIXME style *)
 let download_posts t ids ~naming_scheme =
   let deferreds =
     match naming_scheme with

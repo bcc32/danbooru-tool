@@ -7,14 +7,12 @@ type t =
   ; rate_limiter : Rate_limiter.t }
 [@@deriving fields]
 
-let make_headers t =
-  Option.fold t.auth ~init:(Cohttp.Header.init ())
-    ~f:(fun header { login; api_key } ->
-      Cohttp.Header.add_authorization header (`Basic (login, api_key)))
-;;
-
 let get_body t uri =
-  let headers = make_headers t in
+  let headers =
+    Option.fold t.auth ~init:(Cohttp.Header.init ())
+      ~f:(fun header { login; api_key } ->
+        Cohttp.Header.add_authorization header (`Basic (login, api_key)))
+  in
   let%bind (response, body) =
     Rate_limiter.enqueue t.rate_limiter
       (fun () -> Cohttp_async.Client.get uri ~headers)
@@ -42,7 +40,7 @@ let json_of_string string =
 
 let get_json t uri =
   let%map body = get_string t uri in
-  Or_error.bind body ~f:json_of_string
+  Or_error.(body >>= json_of_string)
 ;;
 
 let get_pipe t uri =
