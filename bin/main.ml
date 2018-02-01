@@ -145,7 +145,7 @@ let async_cmd async =
 ;;
 
 let name    = "danbooru-tool"
-let version = "0.2.0"
+let version = "%%VERSION%%"
 
 let main_cmd =
   Term.(ret (pure (`Help (`Pager, None)))),
