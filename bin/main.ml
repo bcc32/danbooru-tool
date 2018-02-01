@@ -3,8 +3,6 @@ open! Async
 open Cmdliner
 open Danbooru_lib
 
-(* TODO update style *)
-
 let maybe_mkdirp dir =
   Core.Unix.mkdir_p dir;
   dir
