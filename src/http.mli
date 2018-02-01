@@ -10,5 +10,5 @@ type t =
 
 val download : t -> Uri.t -> filename:string -> unit Deferred.Or_error.t
 
-val get      : t -> Uri.t -> string            Deferred.Or_error.t
-val get_json : t -> Uri.t -> Yojson.Basic.json Deferred.Or_error.t
+val get_string : t -> Uri.t -> string Deferred.Or_error.t
+val get_json   : t -> Uri.t -> Json.t Deferred.Or_error.t
