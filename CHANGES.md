@@ -1,4 +1,4 @@
-# v0.2.0 2018-01-31 Cambridge, MA, USA
+# v0.2.0 2018-02-01 Cambridge, MA, USA
 
 - Package using [topkg][topkg].
 - Migrate from `Core.Command` to a [cmdliner][cmdliner]-based CLI.
