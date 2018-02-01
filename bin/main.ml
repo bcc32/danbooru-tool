@@ -138,14 +138,14 @@ let tags_cmd =
     ~sdocs:Manpage.s_common_options
 ;;
 
-let async_term (async, info) =
+let async_term async =
   let run async =
     match Thread_safe.block_on_async (fun () -> async) with
     | Ok (Ok ())   -> `Ok ()
     | Ok (Error e) -> `Error (false, Error.to_string_hum e)
     | Error exn    -> `Error (false, Exn.to_string exn)
   in
-  Term.(ret (pure run $ async)), info
+  Term.(ret (pure run $ async))
 ;;
 
 let name    = "danbooru-tool"
@@ -160,9 +160,10 @@ let main_cmd =
 ;;
 
 let () =
-  Term.eval_choice main_cmd
-    [ async_term pool_cmd
-    ; async_term post_cmd
-    ; async_term tags_cmd ]
+  [ pool_cmd
+  ; post_cmd
+  ; tags_cmd ]
+  |> List.map ~f:(Tuple2.map_fst ~f:async_term)
+  |> Term.eval_choice main_cmd
   |> Term.exit
 ;;
