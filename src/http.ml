@@ -4,30 +4,29 @@ open! Async
 type t =
   { output_dir   : string
   ; auth         : Auth.t option
-  ; rate_limiter : Rate_limiter.t
-  }
+  ; rate_limiter : Rate_limiter.t }
 [@@deriving fields]
 
 let make_headers t =
-  Option.fold t.auth ~init:(Cohttp.Header.init ()) ~f:(fun header { login; api_key } ->
-    Cohttp.Header.add_authorization header (`Basic (login, api_key)))
+  Option.fold t.auth ~init:(Cohttp.Header.init ())
+    ~f:(fun header { login; api_key } ->
+      Cohttp.Header.add_authorization header (`Basic (login, api_key)))
 ;;
 
 let get_body t uri =
   let headers = make_headers t in
   let%bind (response, body) =
-    Rate_limiter.enqueue t.rate_limiter (fun () -> Cohttp_async.Client.get ~headers uri)
+    Rate_limiter.enqueue t.rate_limiter
+      (fun () -> Cohttp_async.Client.get uri ~headers)
   in
   if Cohttp.Code.(is_success (code_of_status response.status))
   then Deferred.(ok (return body))
-  else begin
+  else (
     Deferred.Or_error.error_s
       [%message
         "non-OK status code"
           ~status_code:(response.status : Cohttp.Code.status_code)
-          ~uri:(Uri.to_string uri : string)
-      ]
-  end
+          ~uri:(Uri.to_string uri : string)])
 ;;
 
 let get_string t uri =
@@ -37,7 +36,9 @@ let get_string t uri =
   |> Deferred.ok
 ;;
 
-let json_of_string string = Or_error.try_with (fun () -> Yojson.Basic.from_string string)
+let json_of_string string =
+  Or_error.try_with (fun () -> Yojson.Basic.from_string string)
+;;
 
 let get_json t uri =
   let%map body = get_string t uri in

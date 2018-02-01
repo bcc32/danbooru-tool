@@ -2,12 +2,11 @@ open! Core
 open! Async
 
 type t =
-  { http : Http.t
-  }
-[@@deriving fields]
+  { http : Http.t }
 
 let create http = { http }
 
+(* TODO move error tagging into Post *)
 let download { http } id ~basename =
   let get_post () =
     let%map post = Post.get id ~http in

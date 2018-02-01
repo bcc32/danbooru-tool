@@ -1,12 +1,7 @@
 open! Core
 open! Async
 
-type t = private
-  { id         : int
-  ; post_count : int
-  ; post_ids   : int list
-  }
-[@@deriving fields]
+type t [@@deriving sexp]
 
 val get
   :  int

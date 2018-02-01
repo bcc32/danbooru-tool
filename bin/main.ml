@@ -160,7 +160,6 @@ let () =
   Term.eval_choice main_cmd
     [ async_term pool_cmd
     ; async_term post_cmd
-    ; async_term tags_cmd
-    ]
+    ; async_term tags_cmd ]
   |> Term.exit
 ;;

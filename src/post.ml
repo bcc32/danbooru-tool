@@ -5,8 +5,7 @@ type t =
   { id        : int
   ; file_ext  : string
   ; file_url  : string
-  ; md5       : string
-  }
+  ; md5       : string }
 [@@deriving fields, sexp]
 
 let of_json json =
@@ -25,7 +24,7 @@ let get id ~http =
     Danbooru.make_uri () ~path
     |> Http.get_json http
   in
-  let json = Or_error.tag_arg json "get" () (fun () -> [%message "" ~post_id:(id : int)]) in
+  let json = Or_error.tag_arg json "Post.get" id (fun id -> [%message "" ~post_id:(id : int)]) in
   Or_error.bind json ~f:of_json
 ;;
 

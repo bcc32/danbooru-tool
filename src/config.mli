@@ -7,8 +7,7 @@ type t = private
   ; auth         : Auth.t option
   ; rate_limiter : Rate_limiter.t
   ; http         : Http.t
-  ; downloader   : Downloader.t
-  }
+  ; downloader   : Downloader.t }
 [@@deriving fields]
 
 val create

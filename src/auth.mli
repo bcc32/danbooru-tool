@@ -3,8 +3,7 @@ open! Async
 
 type t =
   { login   : string
-  ; api_key : string
-  }
+  ; api_key : string }
 [@@deriving fields, sexp]
 
 val pp : Format.formatter -> t -> unit

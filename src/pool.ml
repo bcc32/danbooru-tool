@@ -4,9 +4,8 @@ open! Async
 type t =
   { id         : int
   ; post_count : int
-  ; post_ids   : int list
-  }
-[@@deriving fields]
+  ; post_ids   : int list }
+[@@deriving fields, sexp]
 
 let read_posts json =
   let post_ids = Json.(json |> property ~key:"post_ids" >>= to_string) in

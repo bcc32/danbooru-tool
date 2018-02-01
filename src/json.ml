@@ -1,6 +1,5 @@
 open! Core
 open! Async
-open Yojson.Basic.Util
 
 include Or_error.Monad_infix
 
@@ -18,13 +17,17 @@ let rec sexp_of_t =
 ;;
 
 let property t ~key =
-  match member key t with
-  | `Null -> Or_error.error_s [%message "no such key" (t : t) (key : string)]
-  | t -> Ok t
+  Yojson.Basic.Util.(
+    match member key t with
+    | `Null -> Or_error.error_s [%message "no such key" (t : t) (key : string)]
+    | t     -> Ok t)
 ;;
 
 let wrap f = fun t -> Or_error.try_with (fun () -> f t)
 
-let to_int    = wrap to_int
-let to_string = wrap to_string
-let to_list   = wrap to_list
+include struct
+  open Yojson.Basic.Util
+  let to_int    = wrap to_int
+  let to_string = wrap to_string
+  let to_list   = wrap to_list
+end

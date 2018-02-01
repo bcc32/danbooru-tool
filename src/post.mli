@@ -1,13 +1,7 @@
 open! Core
 open! Async
 
-type t = private
-  { id        : int
-  ; file_ext  : string
-  ; file_url  : string
-  ; md5       : string
-  }
-[@@deriving sexp]
+type t [@@deriving sexp]
 
 val of_json : Json.t -> t Or_error.t
 
