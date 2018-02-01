@@ -2,12 +2,13 @@ open! Core
 open! Async
 
 type t =
-  { auth         : Auth.t option
+  { output_dir   : string
+  ; auth         : Auth.t option
   ; rate_limiter : Rate_limiter.t
   }
 [@@deriving fields]
 
-let get { auth; rate_limiter } uri =
+let get { auth; rate_limiter; _ } uri =
   let headers =
     Cohttp.Header.(
       let header = init () in
@@ -40,10 +41,8 @@ let get_json t uri =
   Or_error.bind body ~f:json_of_string
 ;;
 
-let output_dir = ref "."
-
 let download t uri ~filename =
-  let pathname = Filename.concat !output_dir filename in
+  let pathname = Filename.concat t.output_dir filename in
   let%bind contents = get t uri in
   match contents with
   | Error _ as err -> return err
