@@ -18,7 +18,7 @@ let of_json json =
   { id; file_url; md5; file_ext }
 ;;
 
-let get id ~http =
+let get id ~log ~http =
   let json =
     let path = sprintf "/posts/%d.json" id in
     Danbooru.make_uri () ~path
@@ -28,7 +28,10 @@ let get id ~http =
     Deferred.Or_error.tag_arg json "Post.get" id
       (fun id -> [%message "error getting post data" ~post_id:(id : int)])
   in
-  Or_error.(json >>= of_json)
+  let t = Or_error.(json >>= of_json) in
+  if Or_error.is_ok t
+  then (Log.info log "post %d data" id);
+  t
 ;;
 
 let save t ~http ~basename =
@@ -41,14 +44,14 @@ let save t ~http ~basename =
                                        (filename : string)])
 ;;
 
-(* FIXME use log in Config.t *)
-let download t ~http ~basename =
+let download t ~log ~http ~basename =
   let basename =
     match basename with
     | `Md5        -> md5 t
     | `Basename b -> b
   in
   let%map result = save t ~http ~basename in
-  Or_error.iter result ~f:(fun () -> (Log.Global.info "%s %d" t.md5 t.id));
+  if Or_error.is_ok result
+  then (Log.info log "%s %d" t.md5 t.id);
   result
 ;;

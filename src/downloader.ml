@@ -2,14 +2,15 @@ open! Core
 open! Async
 
 type t =
-  { http : Http.t }
+  { log  : Log.t
+  ; http : Http.t }
 
-let create http = { http }
+let create ~log ~http = { log; http }
 
-let download { http } id ~basename =
+let download { log; http } id ~basename =
   let open Deferred.Or_error.Let_syntax in
-  let%bind post = Post.get id ~http in
-  Post.download post ~http ~basename
+  let%bind post = Post.get id ~log ~http in
+  Post.download post ~log ~http ~basename
 ;;
 
 let download_posts t ids ~naming_scheme =

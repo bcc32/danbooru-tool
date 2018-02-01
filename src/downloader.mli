@@ -3,7 +3,10 @@ open! Async
 
 type t
 
-val create : Http.t -> t
+val create
+  :  log  : Log.t
+  -> http : Http.t
+  -> t
 
 val download_posts
   :  t

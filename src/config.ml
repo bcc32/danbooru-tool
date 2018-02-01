@@ -17,7 +17,7 @@ let create ~output_dir ~log_level ~auth ~max_concurrent_jobs =
   in
   let rate_limiter = Rate_limiter.create ~max_concurrent_jobs in
   let http         = Http.Fields.create ~output_dir ~auth ~rate_limiter in
-  let downloader   = Downloader.create http in
+  let downloader   = Downloader.create ~log ~http in
   { output_dir
   ; log
   ; auth

@@ -8,5 +8,7 @@ module Tags       = Tags
 module Post = struct
   type t = Post.t
 
-  let download t ~config = Post.download t ~http:(Config.http config)
+  let download t ~config:({ log; http; _ } : Config.t) =
+    Post.download t ~log ~http
+  ;;
 end
