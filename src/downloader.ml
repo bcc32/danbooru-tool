@@ -12,15 +12,13 @@ let download { http } id ~basename =
   Post.download post ~http ~basename
 ;;
 
-(* FIXME style *)
 let download_posts t ids ~naming_scheme =
-  let deferreds =
+  Deferred.Or_error.all_ignore (
     match naming_scheme with
     | `Md5 -> List.map ids ~f:(download t ~basename:`Md5)
     | `Sequential ->
-      let digits = List.length ids |> Int.to_string |> String.length in
+      (* 0-based indexing; last post numbered [n-1] *)
+      let digits = List.length ids - 1 |> Int.to_string |> String.length in
       let pad = sprintf "%0*d" digits in
-      List.mapi ids ~f:(fun i -> download t ~basename:(`Basename (pad i)))
-  in
-  Deferred.Or_error.all_ignore deferreds
+      List.mapi ids ~f:(fun i -> download t ~basename:(`Basename (pad i))))
 ;;
