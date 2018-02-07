@@ -140,6 +140,8 @@ let tags_cmd : async_cmd =
          ; `P "%%PKG_AUTHORS%%" ]
 ;;
 
+(* FIXME The program may exit before all writers (e.g., log to stdout) are
+   flushed, causing output to be lost. *)
 let async_cmd async =
   let run async =
     match Thread_safe.block_on_async_exn (fun () -> async) with
