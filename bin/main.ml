@@ -142,10 +142,9 @@ let tags_cmd : async_cmd =
 
 let async_cmd async =
   let run async =
-    match Thread_safe.block_on_async (fun () -> async) with
-    | Ok (Ok ())   -> `Ok ()
-    | Ok (Error e) -> `Error (false, Error.to_string_hum e)
-    | Error exn    -> `Error (false, Exn.to_string exn)
+    match Thread_safe.block_on_async_exn (fun () -> async) with
+    | Ok ()   -> `Ok ()
+    | Error e -> `Error (false, Error.to_string_hum e)
   in
   Term.(ret (pure run $ async))
 ;;
