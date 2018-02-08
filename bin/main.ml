@@ -57,7 +57,7 @@ let max_concurrent_jobs =
   |> Arg.value
 ;;
 
-let config =
+let config : Config.t Term.t =
   let make_config output_dir log_level auth max_concurrent_jobs =
     Config.create
       ~output_dir
@@ -140,15 +140,21 @@ let tags_cmd : async_cmd =
          ; `P "%%PKG_AUTHORS%%" ]
 ;;
 
-(* FIXME The program may exit before all writers (e.g., log to stdout) are
-   flushed, causing output to be lost. *)
 let async_cmd async =
-  let run async =
-    match Thread_safe.block_on_async_exn (fun () -> async) with
+  let run (config : Config.t) async =
+    let deferred =
+      Deferred.Or_error.all_ignore
+        [ async
+        (* this feels like a bit of a stopgap, but actually getting "all
+           writers" to flush is non-trivial using [Cmdliner] instead of
+           [Core.Command] *)
+        ; Log.close config.log |> Deferred.ok ]
+    in
+    match Thread_safe.block_on_async_exn (fun () -> deferred) with
     | Ok ()   -> `Ok ()
     | Error e -> `Error (false, Error.to_string_hum e)
   in
-  Term.(ret (pure run $ async))
+  Term.(ret (pure run $ config $ async))
 ;;
 
 let name    = "%%NAME%%"
