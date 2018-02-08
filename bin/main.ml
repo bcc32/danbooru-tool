@@ -97,7 +97,7 @@ let name    = "%%NAME%%"
 let version = "%%VERSION%%"
 
 let main_cmd =
-  Term.(ret (pure (`Help (`Pager, None)))),
+  Term.(ret (pure (`Help (`Auto, None)))),
   Term.info name
     ~doc:"Danbooru download tool"
     ~sdocs:Manpage.s_common_options
