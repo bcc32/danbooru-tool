@@ -1,3 +1,9 @@
+# v0.2.1 2018-02-08 Cambridge, MA, USA
+
+- Bugfix: flush log before exiting; fix log messages that were dropped because
+  they would have been flushed after all downloads completed.
+- Use ```Auto`` manpage format when invoked with no arguments.
+
 # v0.2.0 2018-02-01 Cambridge, MA, USA
 
 - Package using [topkg][topkg].
