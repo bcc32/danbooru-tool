@@ -1,72 +1,6 @@
 open! Core
 open! Async
 open Cmdliner
-open Danbooru_lib
-
-let output_dir =
-  Arg.info [ "d"; "output-dir" ]
-    ~docs:Manpage.s_common_options
-    ~docv:"DIR"
-    ~doc:"Save downloaded image files to directory $(docv)."
-  |> Arg.(opt string ".")
-  |> Arg.value
-;;
-
-let log_level =
-  let of_list verbosity =
-    match verbosity with
-    | []  -> `Error
-    | [_] -> `Info
-    | _   -> `Debug
-  in
-  let flag_count =
-    Arg.info [ "v"; "verbose" ]
-      ~docs:Manpage.s_common_options
-      ~doc:"Increase the level of verbosity."
-    |> Arg.flag_all
-    |> Arg.value
-  in
-  Term.(pure of_list $ flag_count)
-;;
-
-let auth =
-  let auth_conv =
-    let parse s =
-      match Auth.of_string s with
-      | auth -> Ok auth
-      | exception _ -> Error (`Msg "malformed auth string")
-    in
-    Arg.conv (parse, Auth.pp)
-  in
-  Arg.info [ "auth" ]
-    ~env:(Arg.env_var "DANBOORU_AUTH"
-            ~doc:"User and API key used to access Danbooru API.")
-    ~docs:Manpage.s_common_options
-    ~docv:"USER:API_KEY"
-    ~doc:"Set the user and API key used to access the Danbooru API."
-  |> Arg.(opt (some auth_conv) None)
-  |> Arg.value
-;;
-
-let max_concurrent_jobs =
-  Arg.info [ "max-connections" ]
-    ~docs:Manpage.s_common_options
-    ~docv:"INT"
-    ~doc:"Set the maximum number of simultaneous connections."
-  |> Arg.(opt int 5)
-  |> Arg.value
-;;
-
-let config : Config.t Term.t =
-  let make_config output_dir log_level auth max_concurrent_jobs =
-    Config.create
-      ~output_dir
-      ~log_level
-      ~auth
-      ~max_concurrent_jobs
-  in
-  Term.(pure make_config $ output_dir $ log_level $ auth $ max_concurrent_jobs)
-;;
 
 type async_cmd = unit Deferred.Or_error.t Term.t * Term.info
 
@@ -86,11 +20,12 @@ let pool_cmd : async_cmd =
     |> Term.(app (pure of_bool))
   in
   let main config pool_id naming_scheme =
+    let open Danbooru_lib in
     let open Deferred.Or_error.Let_syntax in
-    let%bind pool = Pool.get pool_id ~config in
-    Pool.save_all pool ~config ~naming_scheme
+    Pool.get pool_id ~config
+    >>= Pool.save_all ~config ~naming_scheme
   in
-  Term.(pure main $ config $ pool_id $ naming_scheme),
+  Term.(pure main $ Config.term $ pool_id $ naming_scheme),
   Term.info "pool"
     ~doc:"download a pool of Danbooru posts"
     ~sdocs:Manpage.s_common_options
@@ -105,10 +40,11 @@ let post_cmd : async_cmd =
     |> Arg.(pos_all int [])
     |> Arg.non_empty
   in
-  let main (config : Config.t) ids =
+  let main (config : Danbooru_lib.Config.t) ids =
+    let open Danbooru_lib in
     Downloader.download_posts config.downloader ids ~naming_scheme:`Md5
   in
-  Term.(pure main $ config $ ids),
+  Term.(pure main $ Config.term $ ids),
   Term.info "post"
     ~doc:"download Danbooru posts by ID"
     ~sdocs:Manpage.s_common_options
@@ -127,12 +63,12 @@ let tags_cmd : async_cmd =
     |> Term.(app (pure normalize))
   in
   let main config tags =
+    let open Danbooru_lib in
     let open Deferred.Or_error.Let_syntax in
-    let%bind posts = Tags.search tags ~config in
-    List.map posts ~f:(Post.download ~basename:`Md5 ~config)
-    |> Deferred.Or_error.all_ignore
+    Tags.search tags ~config
+    >>= Deferred.Or_error.List.iter ~f:(Post.download ~basename:`Md5 ~config)
   in
-  Term.(pure main $ config $ tags),
+  Term.(pure main $ Config.term $ tags),
   Term.info "tags"
     ~doc:"download Danbooru posts by tag"
     ~sdocs:Manpage.s_common_options
@@ -141,7 +77,7 @@ let tags_cmd : async_cmd =
 ;;
 
 let async_cmd async =
-  let run (config : Config.t) async =
+  let run (config : Danbooru_lib.Config.t) async =
     let deferred =
       Deferred.Or_error.all_ignore
         [ async
@@ -154,7 +90,7 @@ let async_cmd async =
     | Ok ()   -> `Ok ()
     | Error e -> `Error (false, Error.to_string_hum e)
   in
-  Term.(ret (pure run $ config $ async))
+  Term.(ret (pure run $ Config.term $ async))
 ;;
 
 let name    = "%%NAME%%"
