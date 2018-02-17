@@ -23,7 +23,12 @@ let get_body t uri ~f =
         Cohttp.Header.add_authorization header (`Basic (login, api_key)))
   in
   Rate_limiter.enqueue t.rate_limiter (fun () ->
-    let%bind (response, body) = Cohttp_async.Client.get uri ~headers in
+    let open Deferred.Or_error.Let_syntax in
+    let%bind (response, body) =
+      (* [get] can raise, e.g., if there is no response; this should catch those
+         exceptions and turn them into [Error]s *)
+      Monitor.try_with_or_error (fun () -> Cohttp_async.Client.get uri ~headers)
+    in
     if Cohttp.Code.(is_success (code_of_status response.status))
     then f body
     else (
