@@ -1,3 +1,7 @@
+# v0.2.2 2018-03-03 Cambridge, MA, USA
+
+- Actually fix the bug I tried to fix in v0.2.1. I hope.
+
 # v0.2.1 2018-02-08 Cambridge, MA, USA
 
 - Bugfix: flush log before exiting; fix log messages that were dropped because
