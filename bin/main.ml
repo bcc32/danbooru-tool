@@ -77,14 +77,15 @@ let tags_cmd : async_cmd =
 ;;
 
 let async_cmd async =
-  let run (config : Danbooru_lib.Config.t) async =
+  let run (config : Danbooru_lib.Config.t) (async : unit Deferred.Or_error.t) =
     let deferred =
-      Deferred.Or_error.all_ignore
-        [ async
+      let%bind result = async in
         (* this feels like a bit of a stopgap, but actually getting "all
            writers" to flush is non-trivial using [Cmdliner] instead of
            [Core.Command] *)
-        ; Log.close config.log |> Deferred.ok ]
+      let%bind () = Log.flushed config.log in
+      let%bind () = Log.close   config.log in
+      return result
     in
     match Thread_safe.block_on_async_exn (fun () -> deferred) with
     | Ok ()   -> `Ok ()
