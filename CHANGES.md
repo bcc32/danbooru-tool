@@ -1,6 +1,9 @@
 # v0.2.2 2018-03-03 Cambridge, MA, USA
 
 - Actually fix the bug I tried to fix in v0.2.1. I hope.
+- Bugfix: catch URI resolution errors; should prevent a single URI resolution
+  error from causing all downloads to fail (not sure if this is actually
+  useful).
 
 # v0.2.1 2018-02-08 Cambridge, MA, USA
 
