@@ -14,7 +14,7 @@ let download { log; http } id ~basename =
 ;;
 
 let download_posts t ids ~naming_scheme =
-  Deferred.Or_error.all_ignore (
+  Deferred.Or_error.all_unit (
     match naming_scheme with
     | `Md5 -> List.map ids ~f:(download t ~basename:`Md5)
     | `Sequential ->

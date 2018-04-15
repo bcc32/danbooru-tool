@@ -13,11 +13,11 @@ depends: [
     "ocamlfind" {build}
     "jbuilder"  {build}
     "topkg"     {build & >= "0.9.0"}
-    "async"
-    "async_ssl"
+    "async"     {>= "v0.11.0" & < "v0.12.0"}
+    "async_ssl" {>= "v0.11.0" & < "v0.12.0"}
     "cohttp"
     "cohttp-async"
-    "core"
+    "core"      {>= "v0.11.0" & < "v0.12.0"}
     "yojson"
 ]
 
