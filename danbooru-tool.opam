@@ -7,7 +7,7 @@ authors:    "Aaron L. Zeng <me@bcc32.com>"
 
 homepage:    "https://github.com/bcc32/danbooru-tool"
 bug-reports: "https://github.com/bcc32/danbooru-tool/issues"
-dev-repo:    "git://github.com/bcc32/danbooru-tool"
+dev-repo:    "git+https://github.com/bcc32/danbooru-tool"
 
 depends: [
     "ocamlfind" {build}
