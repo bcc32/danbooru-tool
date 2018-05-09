@@ -3,7 +3,7 @@
 (library
  ((name     danbooru_lib)
   (synopsis "Bindings for Danbooru API")
-  (preprocess (pps (ppx_jane -annotated-ignores ppx_driver.runner)))
+  (preprocess (pps (ppx_jane -annotated-ignores ppxlib.runner)))
   (libraries (core
               async
               cohttp-async

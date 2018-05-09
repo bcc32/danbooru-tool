@@ -115,3 +115,5 @@ let () =
   |> Term.eval_choice main_cmd
   |> Term.exit
 ;;
+
+let _ = 3

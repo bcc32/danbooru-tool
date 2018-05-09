@@ -3,6 +3,6 @@
 (executables
   ((names (main))
    (public_names (danbooru-tool))
-   (preprocess (pps (ppx_jane -annotated-ignores ppx_driver.runner)))
+   (preprocess (pps (ppx_jane -annotated-ignores ppxlib.runner)))
    (libraries (cmdliner
                danbooru_lib))))
