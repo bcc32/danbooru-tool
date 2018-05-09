@@ -1,3 +1,9 @@
+# v0.3.1 2018-05-09 Cambridge, MA, USA
+
+- Add missing dependency on [cmdliner][cmdliner].
+- Migrate from deprecated *ppx_driver* to *ppxlib* as ppx driver; fixes
+  compilation issue caused by missing *ppx_driver* package.
+
 # v0.3.0 2018-04-15 Cambridge, MA, USA
 
 - Require Jane Street libs version v0.11.0.
