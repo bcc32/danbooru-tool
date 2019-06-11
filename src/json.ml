@@ -3,7 +3,7 @@ open! Async
 
 include Or_error.Monad_infix
 
-type t = Yojson.Basic.json
+type t = Yojson.Basic.t
 
 let rec sexp_of_t =
   function

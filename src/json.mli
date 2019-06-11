@@ -1,7 +1,7 @@
 open! Core
 open! Async
 
-type t = Yojson.Basic.json
+type t = Yojson.Basic.t
 
 val property : t -> key:string -> t Or_error.t
 
