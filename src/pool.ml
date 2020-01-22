@@ -9,8 +9,11 @@ type t =
 [@@deriving sexp]
 
 let read_posts json =
-  let post_ids = Json.(json |> property ~key:"post_ids" >>= to_string) in
-  Or_error.(post_ids >>| String.split ~on:' ' >>| List.map ~f:Int.of_string)
+  Json.(
+    json
+    |> property ~key:"post_ids"
+    >>= to_list
+    >>= fun list -> List.map list ~f:to_int |> Or_error.all)
 ;;
 
 let get id ~(config : Config.t) =
