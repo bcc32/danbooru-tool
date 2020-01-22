@@ -8,16 +8,10 @@ let search ~(config : Config.t) tags =
   let tags = String.concat tags ~sep:" " in
   let%bind post_count =
     let uri =
-      Danbooru.make_uri ()
-        ~path:"/counts/posts.json"
-        ~query:[ ("tags", [ tags ]) ]
+      Danbooru.make_uri () ~path:"/counts/posts.json" ~query:[ "tags", [ tags ] ]
     in
     let%map json = Http.get_json http uri in
-    Json.(
-      json
-      >>= property ~key:"counts"
-      >>= property ~key:"posts"
-      >>= to_int)
+    Json.(json >>= property ~key:"counts" >>= property ~key:"posts" >>= to_int)
   in
   match post_count with
   | Error _ as err -> return err
@@ -25,10 +19,10 @@ let search ~(config : Config.t) tags =
     (* round up to full page *)
     let page_count = (post_count + page_size - 1) / page_size in
     let base_uri =
-      Danbooru.make_uri ()
+      Danbooru.make_uri
+        ()
         ~path:"/posts.json"
-        ~query:[ ("tags", [ tags ])
-               ; ("limit", [ Int.to_string page_size ]) ]
+        ~query:[ "tags", [ tags ]; "limit", [ Int.to_string page_size ] ]
     in
     List.range 1 page_count ~stop:`inclusive
     |> List.map ~f:(fun page ->
@@ -36,8 +30,7 @@ let search ~(config : Config.t) tags =
       let%map json = Http.get_json http uri in
       let open Or_error.Let_syntax in
       let%bind posts = json >>= Json.to_list in
-      List.map posts ~f:Post.of_json
-      |> Or_error.all)
+      List.map posts ~f:Post.of_json |> Or_error.all)
     |> Deferred.Or_error.all
     |> Deferred.Or_error.map ~f:List.concat
 ;;

@@ -2,14 +2,15 @@ open! Core
 open! Async
 
 type t =
-  { login   : string
-  ; api_key : string }
+  { login : string
+  ; api_key : string
+  }
 [@@deriving fields, sexp]
 
 let pp fmt t = Sexp.pp_hum fmt [%sexp (t : t)]
 
 let of_string s =
-  let (login, api_key) = String.lsplit2_exn s ~on:':' in
+  let login, api_key = String.lsplit2_exn s ~on:':' in
   { login; api_key }
 ;;
 

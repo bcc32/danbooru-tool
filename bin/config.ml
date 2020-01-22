@@ -3,7 +3,8 @@ open! Async
 open Cmdliner
 
 let output_dir =
-  Arg.info [ "d"; "output-dir" ]
+  Arg.info
+    [ "d"; "output-dir" ]
     ~docs:Manpage.s_common_options
     ~docv:"DIR"
     ~doc:"Save downloaded image files to directory $(docv)."
@@ -14,12 +15,13 @@ let output_dir =
 let log_level =
   let of_list verbosity =
     match verbosity with
-    | []  -> `Error
-    | [_] -> `Info
-    | _   -> `Debug
+    | [] -> `Error
+    | [ _ ] -> `Info
+    | _ -> `Debug
   in
   let flag_count =
-    Arg.info [ "v"; "verbose" ]
+    Arg.info
+      [ "v"; "verbose" ]
       ~docs:Manpage.s_common_options
       ~doc:"Increase the level of verbosity."
     |> Arg.flag_all
@@ -37,9 +39,10 @@ let auth =
     in
     Arg.conv (parse, Danbooru_lib.Auth.pp)
   in
-  Arg.info [ "auth" ]
-    ~env:(Arg.env_var "DANBOORU_AUTH"
-            ~doc:"User and API key used to access Danbooru API.")
+  Arg.info
+    [ "auth" ]
+    ~env:
+      (Arg.env_var "DANBOORU_AUTH" ~doc:"User and API key used to access Danbooru API.")
     ~docs:Manpage.s_common_options
     ~docv:"USER:API_KEY"
     ~doc:"Set the user and API key used to access the Danbooru API."
@@ -48,7 +51,8 @@ let auth =
 ;;
 
 let max_concurrent_jobs =
-  Arg.info [ "max-connections" ]
+  Arg.info
+    [ "max-connections" ]
     ~docs:Manpage.s_common_options
     ~docv:"INT"
     ~doc:"Set the maximum number of simultaneous connections."
@@ -58,11 +62,7 @@ let max_concurrent_jobs =
 
 let term =
   let make_config output_dir log_level auth max_concurrent_jobs =
-    Danbooru_lib.Config.create
-      ~output_dir
-      ~log_level
-      ~auth
-      ~max_concurrent_jobs
+    Danbooru_lib.Config.create ~output_dir ~log_level ~auth ~max_concurrent_jobs
   in
   Term.(pure make_config $ output_dir $ log_level $ auth $ max_concurrent_jobs)
 ;;
