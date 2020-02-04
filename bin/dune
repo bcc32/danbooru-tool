@@ -2,5 +2,5 @@
  (names main)
  (public_names danbooru-tool)
  (preprocess
-  (pps ppx_jane ppxlib.runner -- -annotated-ignores))
+  (pps ppx_jane))
  (libraries cmdliner danbooru_lib))

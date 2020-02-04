@@ -2,5 +2,5 @@
  (name danbooru_lib)
  (synopsis "Bindings for Danbooru API")
  (preprocess
-  (pps ppx_jane ppxlib.runner -- -annotated-ignores))
- (libraries core async cohttp-async yojson))
+  (pps ppx_jane))
+ (libraries async cohttp-async core yojson))
