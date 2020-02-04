@@ -3,4 +3,4 @@
  (synopsis "Bindings for Danbooru API")
  (preprocess
   (pps ppx_jane))
- (libraries async cohttp-async core yojson))
+ (libraries async cohttp-async core ezjsonm))

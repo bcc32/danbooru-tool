@@ -11,7 +11,9 @@ let search ~(config : Config.t) tags =
       Danbooru.make_uri () ~path:"/counts/posts.json" ~query:[ "tags", [ tags ] ]
     in
     let%map json = Http.get_json http uri in
-    Json.(json >>= property ~key:"counts" >>= property ~key:"posts" >>= to_int)
+    let%bind.Or_error json = json in
+    let of_json = Json.Of_json.("counts" @. "posts" @. int) in
+    Json.Of_json.run of_json json
   in
   match post_count with
   | Error _ as err -> return err
@@ -29,9 +31,9 @@ let search ~(config : Config.t) tags =
     |> List.map ~f:(fun page ->
       let uri = Uri.add_query_param' base_uri ("page", Int.to_string page) in
       let%map json = Http.get_json http uri in
-      let open Or_error.Let_syntax in
-      let%bind posts = json >>= Json.to_list in
-      List.map posts ~f:Post.of_json |> Or_error.all)
+      let%bind.Or_error json = json in
+      let of_json = Json.Of_json.list Post.of_json in
+      Json.Of_json.run of_json json)
     |> Deferred.Or_error.all
     |> Deferred.Or_error.map ~f:List.concat
 ;;

@@ -19,7 +19,7 @@ depends: [
     "cohttp"
     "cohttp-async"
     "core"      {>= "v0.13.0" & < "v0.14.0"}
-    "yojson"    {>= "1.6.0"}
+    "ezjsonm"   {>= "1.1.0"}
 ]
 
 build: [

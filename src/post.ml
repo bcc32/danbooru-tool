@@ -9,13 +9,13 @@ type t =
   }
 [@@deriving fields, sexp]
 
-let of_json json =
-  let open Or_error.Let_syntax in
-  let%map id = Json.(json |> property ~key:"id" >>= to_int)
-  and md5 = Json.(json |> property ~key:"md5" >>= to_string)
-  and file_url = Json.(json |> property ~key:"file_url" >>= to_string)
-  and file_ext = Json.(json |> property ~key:"file_ext" >>= to_string) in
-  { id; file_url; md5; file_ext }
+let of_json =
+  [%map_open.Json.Of_json
+    let id = "id" @. int
+    and md5 = "md5" @. string
+    and file_url = "file_url" @. string
+    and file_ext = "file_ext" @. string in
+    { id; file_url; md5; file_ext }]
 ;;
 
 let get id ~log ~http =
@@ -27,7 +27,7 @@ let get id ~log ~http =
     Deferred.Or_error.tag_arg json "Post.get" id (fun id ->
       [%message "error getting post data" ~post_id:(id : int)])
   in
-  let t = Or_error.(json >>= of_json) in
+  let t = Or_error.(json >>= Json.Of_json.run of_json) in
   if Or_error.is_ok t then Log.info log "post %d data" id;
   t
 ;;

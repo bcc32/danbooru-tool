@@ -8,25 +8,23 @@ type t =
   }
 [@@deriving sexp]
 
-let read_posts json =
-  Json.(
-    json
-    |> property ~key:"post_ids"
-    >>= to_list
-    >>= fun list -> List.map list ~f:to_int |> Or_error.all)
-;;
-
 let get id ~(config : Config.t) =
   let json =
     let path = sprintf "/pools/%d.json" id in
     Danbooru.make_uri () ~path |> Http.get_json config.http
   in
   let%map json = json in
-  let open Or_error.Let_syntax in
-  let%bind json = json in
-  let%map post_ids = read_posts json
-  and post_count = Json.(json |> property ~key:"post_count" >>= to_int) in
-  { id; post_count; post_ids }
+  let%bind.Or_error json = json in
+  let of_json =
+    [%map_open.Json.Of_json
+      let post_ids = "post_ids" @. list int
+      and post_count =
+        let open Json.Of_json in
+        "post_count" @. int
+      in
+      { id; post_count; post_ids }]
+  in
+  Json.Of_json.run of_json json
 ;;
 
 let save_all t ~(config : Config.t) ~naming_scheme =
