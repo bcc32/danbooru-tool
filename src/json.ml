@@ -17,7 +17,7 @@ let rec sexp_of_t = function
 let property t ~key =
   Yojson.Basic.Util.(
     match member key t with
-    | `Null -> Or_error.error_s [%message "no such key" (t : t) (key : string)]
+    | `Null -> Or_error.error_s [%message "no such key" (key : string) (t : t)]
     | t -> Ok t)
 ;;
 

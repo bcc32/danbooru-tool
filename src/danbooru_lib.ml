@@ -3,6 +3,7 @@ module Config = Config
 module Downloader = Downloader
 module Pool = Pool
 module Tags = Tags
+module Tree = Tree
 
 (* Version of Post for export *)
 module Post = struct

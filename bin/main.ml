@@ -66,6 +66,27 @@ let tags_cmd : async_cmd =
       ~man:[ `S Manpage.s_authors; `P "%%PKG_AUTHORS%%" ] )
 ;;
 
+let tree_cmd : async_cmd =
+  let roots =
+    (* allow user to enter multiple tags in single arg with spaces *)
+    Arg.info [] ~docv:"ROOT" |> Arg.(pos_all int []) |> Arg.non_empty
+  in
+  let main config roots =
+    let open Danbooru_lib in
+    let open Deferred.Or_error.Let_syntax in
+    Deferred.Or_error.List.iter roots ~f:(fun root ->
+      let%bind tree = Tree.get root ~config in
+      Tree.save_all tree ~config)
+  in
+  ( Term.(pure main $ Config.term $ roots)
+  , Term.info
+      "tree"
+      ~doc:"download Danbooru posts in a tree"
+      ~sdocs:Manpage.s_common_options
+      ~man:[ `S Manpage.s_authors; `P "%%PKG_AUTHORS%%" ] )
+;;
+
+(* TODO: Factor out this async_main logic. *)
 let async_cmd async =
   let run (config : Danbooru_lib.Config.t) (async : unit Deferred.Or_error.t) =
     let deferred =
@@ -98,7 +119,7 @@ let main_cmd =
 ;;
 
 let () =
-  [ pool_cmd; post_cmd; tags_cmd ]
+  [ pool_cmd; post_cmd; tags_cmd; tree_cmd ]
   |> List.map ~f:(Tuple2.map_fst ~f:async_cmd)
   |> Term.eval_choice main_cmd
   |> Term.exit
