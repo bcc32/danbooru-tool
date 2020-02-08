@@ -7,6 +7,7 @@
 (source (github bcc32/danbooru-tool))
 (package
  (name danbooru-tool)
+ (synopsis "A simple tool for downloading posts from danbooru image boards")
  (depends
   (dune (>= 2.0))
   (topkg (and :build (>= 0.9.0)))
