@@ -1,3 +1,8 @@
+# v0.4.0 2020-02-08 New York, NY, USA
+
+- Require Jane Street libs version v0.13.0.
+- Add `tree` subcommand.
+
 # v0.3.1 2018-05-09 Cambridge, MA, USA
 
 - Add missing dependency on [cmdliner][cmdliner].
