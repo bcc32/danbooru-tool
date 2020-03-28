@@ -1,3 +1,8 @@
+# v0.4.1 2020-03-07 New York, NY, USA
+
+- Update `tree` subcommand for Danbooru API changes.  See
+  [forum](https://danbooru.donmai.us/forum_topics/9127?page=293#forum_post_163246).
+
 # v0.4.0 2020-02-08 New York, NY, USA
 
 - Require Jane Street libs version v0.13.0.
