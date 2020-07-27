@@ -54,7 +54,7 @@ let download t uri ~filename =
   let%bind output_dir = t.output_dir in
   let path = Filename.concat output_dir filename in
   get_pipe t uri ~f:(fun body ->
-    Writer.with_file path ~f:(fun w ->
+    Writer.with_file_atomic path ~f:(fun w ->
       let w = Writer.pipe w in
       Pipe.transfer body w ~f:Fn.id)
     |> Deferred.ok)
