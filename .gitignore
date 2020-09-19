@@ -1,14 +1,29 @@
-.DS_Store
+*.annot
+*.cmo
+*.cma
+*.cmi
+*.a
+*.o
+*.cmx
+*.cmxs
+*.cmxa
 
-# Jenga artifacts
+# ocamlbuild working directory
+_build/
+
+# ocamlbuild targets
+*.byte
+*.native
+
+# oasis generated files
+setup.data
+setup.log
+
+# Merlin configuring file for Vim and Emacs
 .merlin
-.findlib-packages
-.jenga
-.ocaml-bin
-.omake-ocaml-bin
-.opam-bin
+
+# Dune generated files
 *.install
 
-# Build
-_build
-*.native
+# Local OPAM switch
+_opam/
