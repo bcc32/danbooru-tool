@@ -20,6 +20,6 @@ danbooru-tool tags [-v] [-d output-dir] <tag> [<tag>...]
 
 ```sh
 # git clone and chdir
-jbuilder build
-jbuilder exec -- danbooru-tool --help
+dune build
+dune exec -- danbooru-tool --help
 ```
