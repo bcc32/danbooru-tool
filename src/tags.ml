@@ -24,14 +24,10 @@ let search ~(config : Config.t) tags =
         ~path:"/posts.json"
         ~query:[ "tags", [ tags ]; "limit", [ Int.to_string page_size ] ]
     in
-    (* FIXME: This can use [Deferred.List.init]. *)
-    List.range 1 page_count ~stop:`inclusive
-    |> List.map ~f:(fun page ->
+    Deferred.Or_error.List.init ~how:`Parallel page_count ~f:(fun page ->
+      let page = page + 1 in
       let uri = Uri.add_query_param' base_uri ("page", Int.to_string page) in
-      let%map json = Http.get_json http uri in
-      let open Or_error.Let_syntax in
-      let%bind posts = json >>= Json.to_list in
-      return (List.map posts ~f:Post.of_json))
-    |> Deferred.Or_error.all
-    |> Deferred.Or_error.map ~f:List.concat
+      Http.get_json http uri >>| Or_error.bind ~f:Json.to_list)
+    >>|? List.concat
+    >>|? List.map ~f:Post.of_json
 ;;
