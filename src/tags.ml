@@ -31,7 +31,7 @@ let search ~(config : Config.t) tags =
       let%map json = Http.get_json http uri in
       let open Or_error.Let_syntax in
       let%bind posts = json >>= Json.to_list in
-      List.map posts ~f:Post.of_json |> Or_error.all)
+      return (List.map posts ~f:Post.of_json))
     |> Deferred.Or_error.all
     |> Deferred.Or_error.map ~f:List.concat
 ;;
