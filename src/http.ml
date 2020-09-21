@@ -27,13 +27,13 @@ let get_body t uri ~f =
          exceptions and turn them into [Error]s *)
       Monitor.try_with_or_error (fun () -> Cohttp_async.Client.get uri ~headers)
     in
-    if Cohttp.Code.(is_success (code_of_status response.status))
-    then f body
-    else
+    match response.status with
+    | #Cohttp.Code.success_status -> f body
+    | status_code ->
       Deferred.Or_error.error_s
         [%message
           "non-OK status code"
-            ~status_code:(response.status : Cohttp.Code.status_code)
+            ~status_code:(status_code : Cohttp.Code.status_code)
             ~uri:(Uri.to_string uri : string)])
 ;;
 
