@@ -2,4 +2,4 @@ open! Core
 open! Async
 
 (** Configuration options common to all commands. *)
-val term : Danbooru_lib.Config.t Cmdliner.Term.t
+val term : (module Danbooru_lib.Danbooru.S) Cmdliner.Term.t

@@ -1,7 +1,6 @@
 open! Core
 open! Async
-
-(* TODO: Functorize these modules over http, log dependencies. *)
+include Post_intf
 
 module Maybe_banned = struct
   type 'a t =
@@ -41,39 +40,45 @@ let of_json ?id:provided_id json =
   }
 ;;
 
-let get id ~log ~http =
-  let json =
-    let path = sprintf "/posts/%d.json" id in
-    Danbooru.make_uri () ~path |> Http.get_json http
-  in
-  let%map json =
-    Deferred.Or_error.tag_arg json "Post.get" id (fun id ->
-      [%message "error getting post data" ~post_id:(id : int)])
-  in
-  let t = Or_error.(json >>| of_json ~id) in
-  if Or_error.is_ok t then Log.info log "post %d data" id;
-  t
-;;
+module Make (Config : Config.S) = struct
+  type nonrec t = t [@@deriving sexp]
 
-let download t ~log ~http ~basename =
-  match t.maybe_banned with
-  | Banned ->
-    return
-      (Or_error.error_s
-         [%message
-           "Post missing download information"
-             ~post_id:(t.provided_id : (int option[@sexp.option]))])
-  | Not_banned { id; file_ext; file_url; md5 } ->
-    let basename =
-      match basename with
-      | `Md5 -> md5
-      | `Basename b -> b
+  let of_json = of_json
+
+  let get id =
+    let json =
+      let path = sprintf "/posts/%d.json" id in
+      Which_server.make_uri () ~path |> Http.get_json Config.http
     in
-    let filename = basename ^ "." ^ file_ext in
-    let uri = Danbooru.resolve (Uri.of_string file_url) in
-    let%map result = Http.download http uri ~filename in
-    if Or_error.is_ok result then Log.info log "%s %d" md5 id;
-    Or_error.tag_s
-      result
-      ~tag:[%message "Couldn't download post" ~post_id:(id : int) (filename : string)]
-;;
+    let%map json =
+      Deferred.Or_error.tag_arg json "Post.get" id (fun id ->
+        [%message "error getting post data" ~post_id:(id : int)])
+    in
+    let t = Or_error.(json >>| of_json ~id) in
+    if Or_error.is_ok t then Log.info Config.log "post %d data" id;
+    t
+  ;;
+
+  let download t ~basename =
+    match t.maybe_banned with
+    | Banned ->
+      return
+        (Or_error.error_s
+           [%message
+             "Post missing download information"
+               ~post_id:(t.provided_id : (int option[@sexp.option]))])
+    | Not_banned { id; file_ext; file_url; md5 } ->
+      let basename =
+        match basename with
+        | `Md5 -> md5
+        | `Basename b -> b
+      in
+      let filename = basename ^ "." ^ file_ext in
+      let uri = Which_server.resolve (Uri.of_string file_url) in
+      let%map result = Http.download Config.http uri ~filename in
+      if Or_error.is_ok result then Log.info Config.log "%s %d" md5 id;
+      Or_error.tag_s
+        result
+        ~tag:[%message "Couldn't download post" ~post_id:(id : int) (filename : string)]
+  ;;
+end

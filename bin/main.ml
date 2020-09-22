@@ -16,10 +16,10 @@ let pool_cmd : async_cmd =
     |> Arg.value
     |> Term.(app (pure of_bool))
   in
-  let main config pool_id naming_scheme =
-    let open Danbooru_lib in
+  let main (danbooru : (module Danbooru_lib.Danbooru.S)) pool_id naming_scheme =
+    let open (val danbooru) in
     let open Deferred.Or_error.Let_syntax in
-    Pool.get pool_id ~config >>= Pool.save_all ~config ~naming_scheme
+    Pool.get pool_id >>= Pool.save_all ~naming_scheme
   in
   ( Term.(pure main $ Config.term $ pool_id $ naming_scheme)
   , Term.info
@@ -31,9 +31,9 @@ let pool_cmd : async_cmd =
 
 let post_cmd : async_cmd =
   let ids = Arg.info [] ~docv:"ID" |> Arg.(pos_all int []) |> Arg.non_empty in
-  let main (config : Danbooru_lib.Config.t) ids =
-    let open Danbooru_lib in
-    Downloader.download_posts config.downloader ids ~naming_scheme:`Md5
+  let main (danbooru : (module Danbooru_lib.Danbooru.S)) ids =
+    let open (val danbooru) in
+    Downloader.download_posts ids ~naming_scheme:`Md5
   in
   ( Term.(pure main $ Config.term $ ids)
   , Term.info
@@ -52,11 +52,10 @@ let tags_cmd : async_cmd =
     |> Arg.non_empty
     |> Term.(app (pure normalize))
   in
-  let main config tags =
-    let open Danbooru_lib in
+  let main (danbooru : (module Danbooru_lib.Danbooru.S)) tags =
+    let open (val danbooru) in
     let open Deferred.Or_error.Let_syntax in
-    Tags.search tags ~config
-    >>= Deferred.Or_error.List.iter ~f:(Post.download ~basename:`Md5 ~config)
+    Tags.search tags >>= Deferred.Or_error.List.iter ~f:(Post.download ~basename:`Md5)
   in
   ( Term.(pure main $ Config.term $ tags)
   , Term.info
@@ -71,12 +70,12 @@ let tree_cmd : async_cmd =
     (* allow user to enter multiple tags in single arg with spaces *)
     Arg.info [] ~docv:"ROOT" |> Arg.(pos_all int []) |> Arg.non_empty
   in
-  let main config roots =
-    let open Danbooru_lib in
+  let main (danbooru : (module Danbooru_lib.Danbooru.S)) roots =
+    let open (val danbooru) in
     let open Deferred.Or_error.Let_syntax in
     Deferred.Or_error.List.iter roots ~f:(fun root ->
-      let%bind tree = Tree.get root ~config in
-      Tree.save_all tree ~config)
+      let%bind tree = Tree.get root in
+      Tree.save_all tree)
   in
   ( Term.(pure main $ Config.term $ roots)
   , Term.info
@@ -88,14 +87,16 @@ let tree_cmd : async_cmd =
 
 (* TODO: Factor out this async_main logic. *)
 let async_cmd async =
-  let run (config : Danbooru_lib.Config.t) (async : unit Deferred.Or_error.t) =
+  let run (danbooru : (module Danbooru_lib.Danbooru.S)) (async : unit Deferred.Or_error.t)
+    =
+    let open (val danbooru) in
     let deferred =
       let%bind result = async in
       (* this feels like a bit of a stopgap, but actually getting "all
          writers" to flush is non-trivial using [Cmdliner] instead of
          [Core.Command] *)
-      let%bind () = Log.flushed config.log in
-      let%bind () = Log.close config.log in
+      let%bind () = Log.flushed Config.log in
+      let%bind () = Log.close Config.log in
       return result
     in
     match Thread_safe.block_on_async_exn (fun () -> deferred) with

@@ -1,13 +1,3 @@
 module Auth = Auth
 module Config = Config
-module Downloader = Downloader
-module Pool = Pool
-module Tags = Tags
-module Tree = Tree
-
-(* Version of Post for export *)
-module Post = struct
-  type t = Post.t
-
-  let download t ~config:({ log; http; _ } : Config.t) = Post.download t ~log ~http
-end
+module Danbooru = Danbooru
