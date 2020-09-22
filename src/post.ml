@@ -50,7 +50,7 @@ module Make (Config : Config.S) = struct
   let get id =
     let json =
       let path = sprintf "/posts/%d.json" id in
-      Which_server.make_uri () ~path |> Http.get_json Config.http
+      Config.Which_server.make_uri () ~path |> Http.get_json Config.http
     in
     let%map json =
       Deferred.Or_error.tag_arg json "Post.get" id (fun id ->
@@ -68,7 +68,10 @@ module Make (Config : Config.S) = struct
     let tags = String.concat tags ~sep:" " in
     let%bind post_count =
       let uri =
-        Which_server.make_uri () ~path:"/counts/posts.json" ~query:[ "tags", [ tags ] ]
+        Config.Which_server.make_uri
+          ()
+          ~path:"/counts/posts.json"
+          ~query:[ "tags", [ tags ] ]
       in
       let%map json = Http.get_json http uri in
       Json.(json >>= property ~key:"counts" >>= property ~key:"posts" >>= to_int)
@@ -79,7 +82,7 @@ module Make (Config : Config.S) = struct
       (* round up to full page *)
       let page_count = (post_count + page_size - 1) / page_size in
       let base_uri =
-        Which_server.make_uri
+        Config.Which_server.make_uri
           ()
           ~path:"/posts.json"
           ~query:[ "tags", [ tags ]; "limit", [ Int.to_string page_size ] ]
@@ -107,7 +110,7 @@ module Make (Config : Config.S) = struct
         | `Basename b -> b
       in
       let filename = basename ^ "." ^ file_ext in
-      let uri = Which_server.resolve (Uri.of_string file_url) in
+      let uri = Config.Which_server.resolve (Uri.of_string file_url) in
       let%map result = Http.download Config.http uri ~filename in
       if Or_error.is_ok result then Log.info Config.log "%s %d" md5 id;
       Or_error.tag_s

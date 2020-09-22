@@ -1,11 +1,13 @@
 open! Core
+include Which_server_intf
 
-(* TODO make this configurable *)
-let scheme = "https"
-let host = "danbooru.donmai.us"
-let make_uri = Uri.make ~scheme ~host ?port:None
+module Make (Server : Server) = struct
+  open Server
 
-let resolve =
-  let base = Uri.make () ~scheme ~host in
-  Uri.resolve scheme base
-;;
+  let make_uri = Uri.make ~scheme ~host ?port:None
+
+  let resolve =
+    let base = Uri.make () ~scheme ~host in
+    Uri.resolve scheme base
+  ;;
+end

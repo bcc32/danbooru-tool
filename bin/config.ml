@@ -63,7 +63,7 @@ let max_concurrent_jobs =
 let term =
   let make_config output_dir log_level auth max_concurrent_jobs =
     let (module Config) =
-      Danbooru_lib.Config.create ~output_dir ~log_level ~auth ~max_concurrent_jobs
+      Danbooru_lib.Config.create ~output_dir ~log_level ~auth ~max_concurrent_jobs ()
     in
     (module Danbooru_lib.Danbooru.Make (Config) : Danbooru_lib.Danbooru.S)
   in

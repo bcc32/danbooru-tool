@@ -19,7 +19,7 @@ module Make (Config : Config.S) (Downloader : Downloader.S) = struct
   let rec get id =
     let json =
       let path = sprintf "/posts/%d.json" id in
-      Which_server.make_uri () ~path ~query:[ "only", [ "children[id]" ] ]
+      Config.Which_server.make_uri () ~path ~query:[ "only", [ "children[id]" ] ]
       |> Http.get_json Config.http
     in
     let open Deferred.Or_error.Let_syntax in
