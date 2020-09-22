@@ -1,0 +1,6 @@
+(library
+ (name danbooru_lib_test)
+ (libraries core async expect_test_helpers danbooru_lib)
+ (inline_tests)
+ (preprocess
+  (pps ppx_jane)))

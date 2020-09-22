@@ -8,6 +8,7 @@
 (package
  (name danbooru-tool)
  (synopsis "A simple tool for downloading posts from danbooru image boards")
+ ;; FIXME: Upgrade JS libraries
  (depends
   (dune (>= 2.0))
   (topkg (and :build (>= 0.9.0)))
@@ -17,4 +18,5 @@
   cohttp
   cohttp-async
   (core (and (>= v0.13.0) (< v0.14.0)))
+  (expect_test_helpers (and (>= v0.13.0) (< v0.14.0)))
   yojson))
