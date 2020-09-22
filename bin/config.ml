@@ -2,6 +2,16 @@ open! Core
 open! Async
 open Cmdliner
 
+let which_server =
+  Arg.info
+    [ "h"; "host" ]
+    ~docs:Manpage.s_common_options
+    ~docv:"HOST"
+    ~doc:"Connect to $(docv).  Default is Danbooru."
+  |> Arg.(opt (some string) None)
+  |> Arg.value
+;;
+
 let output_dir =
   Arg.info
     [ "d"; "output-dir" ]
@@ -61,11 +71,18 @@ let max_concurrent_jobs =
 ;;
 
 let term =
-  let make_config output_dir log_level auth max_concurrent_jobs =
+  let make_config which_server output_dir log_level auth max_concurrent_jobs =
     let (module Config) =
-      Danbooru_lib.Config.create ~output_dir ~log_level ~auth ~max_concurrent_jobs ()
+      Danbooru_lib.Config.create
+        ?which_server
+        ~output_dir
+        ~log_level
+        ~auth
+        ~max_concurrent_jobs
+        ()
     in
     (module Danbooru_lib.Danbooru.Make (Config) : Danbooru_lib.Danbooru.S)
   in
-  Term.(pure make_config $ output_dir $ log_level $ auth $ max_concurrent_jobs)
+  Term.(
+    pure make_config $ which_server $ output_dir $ log_level $ auth $ max_concurrent_jobs)
 ;;
