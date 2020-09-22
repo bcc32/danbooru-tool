@@ -6,7 +6,6 @@ module Make (Config : Config.S) = struct
   module Config = Config
   module Post = Post.Make (Config)
   module Downloader = Downloader.Make (Config) (Post)
-  module Tags = Tags.Make (Config) (Post)
   module Pool = Pool.Make (Config) (Downloader)
   module Tree = Tree.Make (Config) (Downloader)
 end

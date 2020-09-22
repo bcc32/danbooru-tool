@@ -55,7 +55,7 @@ let tags_cmd : async_cmd =
   let main (danbooru : (module Danbooru_lib.Danbooru.S)) tags =
     let open (val danbooru) in
     let open Deferred.Or_error.Let_syntax in
-    Tags.search tags >>= Deferred.Or_error.List.iter ~f:(Post.download ~basename:`Md5)
+    Post.search tags >>= Deferred.Or_error.List.iter ~f:(Post.download ~basename:`Md5)
   in
   ( Term.(pure main $ Config.term $ tags)
   , Term.info
