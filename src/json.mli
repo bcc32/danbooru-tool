@@ -1,7 +1,7 @@
 open! Core
 open! Async
 
-type t = Yojson.Basic.t
+type t = Yojson.Basic.t [@@deriving sexp]
 
 val property : t -> key:string -> t Or_error.t
 val to_int : t -> int Or_error.t

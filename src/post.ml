@@ -21,6 +21,7 @@ type unbanned =
 type t =
   { provided_id : int option
   ; maybe_banned : unbanned Maybe_banned.t
+  ; json : Json.t
   }
 [@@deriving sexp]
 
@@ -37,6 +38,7 @@ let of_json ?id:provided_id json =
       (match unbanned with
        | Error _ -> Banned
        | Ok unbanned -> Not_banned unbanned)
+  ; json
   }
 ;;
 

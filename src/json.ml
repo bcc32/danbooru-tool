@@ -4,15 +4,8 @@ include Or_error.Monad_infix
 
 type t = Yojson.Basic.t
 
-let rec sexp_of_t = function
-  | `Assoc a -> [%sexp_of: (string, t) List.Assoc.t] a
-  | `Bool b -> sexp_of_bool b
-  | `Float f -> sexp_of_float f
-  | `Int i -> sexp_of_int i
-  | `List l -> [%sexp_of: t list] l
-  | `Null -> Atom "null"
-  | `String s -> Atom s
-;;
+let sexp_of_t t = [%sexp_of: string] (Yojson.Basic.to_string t)
+let t_of_sexp sexp = Yojson.Basic.from_string ([%of_sexp: string] sexp)
 
 let property t ~key =
   Yojson.Basic.Util.(
