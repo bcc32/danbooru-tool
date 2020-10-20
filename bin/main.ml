@@ -4,6 +4,15 @@ open Cmdliner
 
 type async_cmd = unit Deferred.Or_error.t Term.t * Term.info
 
+let dump_only =
+  Arg.info
+    [ "dump" ]
+    ~docs:Manpage.s_options
+    ~doc:"Dump post info a s-expressions instead of downloading."
+  |> Arg.flag
+  |> Arg.value
+;;
+
 let pool_cmd : async_cmd =
   let pool_id = Arg.info [] ~docv:"ID" |> Arg.(pos 0 (some int) None) |> Arg.required in
   let naming_scheme =
@@ -52,12 +61,18 @@ let tags_cmd : async_cmd =
     |> Arg.non_empty
     |> Term.(app (pure normalize))
   in
-  let main (danbooru : (module Danbooru_lib.Danbooru.S)) tags =
+  let main (danbooru : (module Danbooru_lib.Danbooru.S)) dump_only tags =
     let open (val danbooru) in
     let open Deferred.Or_error.Let_syntax in
-    Post.search tags >>= Deferred.Or_error.List.iter ~f:(Post.download ~basename:`Md5)
+    Post.search tags
+    >>= Deferred.Or_error.List.iter ~f:(fun post ->
+      if dump_only
+      then (
+        print_s [%sexp (post : Post.t)];
+        return ())
+      else Post.download post ~basename:`Md5)
   in
-  ( Term.(pure main $ Config.term $ tags)
+  ( Term.(pure main $ Config.term $ dump_only $ tags)
   , Term.info
       "tags"
       ~doc:"download Danbooru posts by tag"
