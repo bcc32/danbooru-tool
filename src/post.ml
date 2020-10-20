@@ -61,7 +61,7 @@ module Make (Config : Config.S) = struct
     t
   ;;
 
-  let page_size = 20
+  let page_size = 100
 
   let search tags =
     let http = Config.http in
