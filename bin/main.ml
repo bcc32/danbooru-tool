@@ -63,14 +63,14 @@ let tags_cmd : async_cmd =
   in
   let main (danbooru : (module Danbooru_lib.Danbooru.S)) dump_only tags =
     let open (val danbooru) in
-    let open Deferred.Or_error.Let_syntax in
-    Post.search tags
-    >>= Deferred.Or_error.List.iter ~f:(fun post ->
-      if dump_only
-      then (
-        print_s [%sexp (post : Post.t)];
-        return ())
-      else Post.download post ~basename:`Md5)
+    Monitor.try_with_or_error (fun () ->
+      Post.search tags
+      |> Pipe.iter ~f:(fun post ->
+        if dump_only
+        then (
+          print_s [%sexp (post : Post.t)];
+          return ())
+        else Post.download post ~basename:`Md5 >>| ok_exn))
   in
   ( Term.(pure main $ Config.term $ dump_only $ tags)
   , Term.info

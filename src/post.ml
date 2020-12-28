@@ -66,33 +66,29 @@ module Make (Config : Config.S) = struct
   let search tags =
     let http = Config.http in
     let tags = String.concat tags ~sep:" " in
-    let%bind post_count =
-      let uri =
-        Config.Which_server.make_uri
-          ()
-          ~path:"/counts/posts.json"
-          ~query:[ "tags", [ tags ] ]
-      in
-      let%map json = Http.get_json http uri in
-      Json.(json >>= property ~key:"counts" >>= property ~key:"posts" >>= to_int)
+    let base_uri =
+      Config.Which_server.make_uri
+        ()
+        ~path:"/posts.json"
+        ~query:[ "tags", [ tags ]; "limit", [ Int.to_string page_size ] ]
     in
-    match post_count with
-    | Error _ as err -> return err
-    | Ok post_count ->
-      (* round up to full page *)
-      let page_count = (post_count + page_size - 1) / page_size in
-      let base_uri =
-        Config.Which_server.make_uri
-          ()
-          ~path:"/posts.json"
-          ~query:[ "tags", [ tags ]; "limit", [ Int.to_string page_size ] ]
-      in
-      Deferred.Or_error.List.init ~how:`Parallel page_count ~f:(fun page ->
-        let page = page + 1 in
+    Pipe.create_reader ~close_on_exception:false (fun writer ->
+      let rec loop page =
         let uri = Uri.add_query_param' base_uri ("page", Int.to_string page) in
-        Http.get_json http uri >>| Or_error.bind ~f:Json.to_list)
-      >>|? List.concat
-      >>|? List.map ~f:of_json
+        match%bind
+          Http.get_json http uri
+          >>| Or_error.bind ~f:Json.to_list
+          >>|? List.map ~f:of_json
+        with
+        | Error _ -> raise_s [%message "error"]
+        | Ok posts ->
+          (match posts with
+           | [] -> return ()
+           | _ :: _ as posts ->
+             List.iter posts ~f:(Pipe.write_without_pushback writer);
+             loop (page + 1))
+      in
+      loop 1)
   ;;
 
   let download t ~basename =

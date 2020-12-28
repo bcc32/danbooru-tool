@@ -12,7 +12,7 @@ module type S = sig
 
   val of_json : ?id:int -> Json.t -> t
   val get : int -> t Deferred.Or_error.t
-  val search : string list -> t list Deferred.Or_error.t
+  val search : string list -> t Pipe.Reader.t
   val download : t -> basename:[ `Md5 | `Basename of string ] -> unit Deferred.Or_error.t
 end
 
