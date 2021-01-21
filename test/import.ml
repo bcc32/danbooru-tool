@@ -1,6 +1,7 @@
 open! Core
 open! Async
-include Expect_test_helpers
+include Expect_test_helpers_core
+include Expect_test_helpers_async
 
 let test (type a) (f : (module Danbooru_lib.Danbooru.S) -> a Deferred.t) : a Deferred.t =
   within_temp_dir (fun () ->

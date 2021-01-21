@@ -12,7 +12,7 @@ let create
   =
   let log =
     let output = [ Log.Output.stdout () ] in
-    Log.create ~level:log_level ~output ~on_error:`Raise
+    Log.create ~level:log_level ~output ~on_error:`Raise ()
   in
   let rate_limiter = Rate_limiter.create ~max_concurrent_jobs in
   let http = Http.create () ~output_dir ?auth ~rate_limiter in
