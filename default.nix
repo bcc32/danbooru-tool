@@ -1,10 +1,7 @@
-with import <nixpkgs> { };
+{ lib, nix-gitignore, buildDunePackage, async, async_ssl, cmdliner, core, cohttp
+, cohttp-async, yojson }:
 
-let
-  inherit (ocamlPackages)
-    buildDunePackage async async_ssl cmdliner core cohttp cohttp-async yojson;
-
-in buildDunePackage {
+buildDunePackage {
   pname = "danbooru-tool";
   version = "0.4.1";
   useDune2 = true;
