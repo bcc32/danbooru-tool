@@ -1,4 +1,13 @@
 { pkgs ? import <nixpkgs> { } }:
-pkgs.mkShell {
-  buildInputs = with pkgs; [ m4 libffi openssl pkgconfig ];
+
+with pkgs;
+mkShell {
+  buildInputs = [
+    # For opam
+    m4
+    opam
+    pkgconfig
+    # For this project
+    openssl
+  ];
 }
