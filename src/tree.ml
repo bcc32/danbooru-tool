@@ -29,12 +29,7 @@ module Make (Config : Config.S) (Downloader : Downloader.S) = struct
     return { id; children }
   ;;
 
-  let all_post_ids t =
-    let rec loop t accum =
-      t.id :: List.fold t.children ~init:accum ~f:(fun accum child -> loop child accum)
-    in
-    loop t []
-  ;;
+  let rec all_post_ids t = t.id :: List.concat_map t.children ~f:all_post_ids
 
   let save_all t =
     let%map result = Downloader.download_posts (all_post_ids t) ~naming_scheme:`Md5 in
