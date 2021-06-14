@@ -20,7 +20,7 @@ module Make (Config : Config.S) (Downloader : Downloader.S) = struct
 
   let get id =
     let json =
-      let path = sprintf "/pools/%d.json" id in
+      let path = sprintf "/pools/%d" id in
       Config.Which_server.make_uri () ~path |> Http.get_json Config.http
     in
     let%map json = json in

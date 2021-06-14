@@ -15,9 +15,9 @@ let create ?auth ~output_dir ~rate_limiter () =
   { auth; rate_limiter; output_dir }
 ;;
 
-let get_body t uri ~f =
+let get_body ?(headers = Cohttp.Header.init ()) t uri ~f =
   let headers =
-    Option.fold t.auth ~init:(Cohttp.Header.init ()) ~f:(fun header { login; api_key } ->
+    Option.fold t.auth ~init:headers ~f:(fun header { login; api_key } ->
       Cohttp.Header.add_authorization header (`Basic (login, api_key)))
   in
   Rate_limiter.enqueue t.rate_limiter (fun () ->
@@ -37,14 +37,23 @@ let get_body t uri ~f =
             ~uri:(Uri.to_string uri : string)])
 ;;
 
-let get_string t uri =
-  get_body t uri ~f:(fun body -> Cohttp_async.Body.to_string body |> Deferred.ok)
+let get_string ?headers t uri =
+  get_body ?headers t uri ~f:(fun body -> Cohttp_async.Body.to_string body |> Deferred.ok)
 ;;
 
 let json_of_string string = Or_error.try_with (fun () -> Yojson.Basic.from_string string)
 
-let get_json t uri =
-  let%map body = get_string t uri in
+let get_json ?headers t uri =
+  let%map body =
+    get_string
+      t
+      uri
+      ~headers:
+        (match headers with
+         | None -> Cohttp.Header.init_with "Accept" "application/json"
+         | Some headers ->
+           Cohttp.Header.add_unless_exists headers "Accept" "application/json")
+  in
   Or_error.(body >>= json_of_string)
 ;;
 
