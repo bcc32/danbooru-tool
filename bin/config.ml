@@ -45,7 +45,11 @@ let auth =
     let parse s =
       match Danbooru_lib.Auth.of_string s with
       | auth -> Ok auth
-      | exception _ -> Error (`Msg "malformed auth string")
+      | exception exn ->
+        Error
+          (`Msg
+             (Error.create_s [%message "malformed auth string" ~_:(exn : exn)]
+              |> Error.to_string_hum))
     in
     Arg.conv (parse, Danbooru_lib.Auth.pp)
   in
