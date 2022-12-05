@@ -13,7 +13,7 @@
   (topkg (and :build (>= 0.9.0)))
   (async (and (>= v0.14.0) (< v0.15.0)))
   (async_ssl (and (>= v0.14.0) (< v0.15.0)))
-  cmdliner
+  (cmdliner (>= 1.1))
   cohttp
   cohttp-async
   (core (and (>= v0.14.0) (< v0.15.0)))

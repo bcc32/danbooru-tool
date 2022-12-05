@@ -37,7 +37,7 @@ let log_level =
     |> Arg.flag_all
     |> Arg.value
   in
-  Term.(pure of_list $ flag_count)
+  Term.(const of_list $ flag_count)
 ;;
 
 let auth =
@@ -56,7 +56,7 @@ let auth =
   Arg.info
     [ "auth" ]
     ~env:
-      (Arg.env_var "DANBOORU_AUTH" ~doc:"User and API key used to access Danbooru API.")
+      (Cmd.Env.info "DANBOORU_AUTH" ~doc:"User and API key used to access Danbooru API.")
     ~docs:Manpage.s_common_options
     ~docv:"USER:API_KEY"
     ~doc:"Set the user and API key used to access the Danbooru API."
@@ -88,5 +88,5 @@ let term =
     (module Danbooru_lib.Danbooru.Make (Config) : Danbooru_lib.Danbooru.S)
   in
   Term.(
-    pure make_config $ which_server $ output_dir $ log_level $ auth $ max_concurrent_jobs)
+    const make_config $ which_server $ output_dir $ log_level $ auth $ max_concurrent_jobs)
 ;;
