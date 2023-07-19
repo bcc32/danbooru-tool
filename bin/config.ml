@@ -48,8 +48,8 @@ let auth =
       | exception exn ->
         Error
           (`Msg
-             (Error.create_s [%message "malformed auth string" ~_:(exn : exn)]
-              |> Error.to_string_hum))
+            (Error.create_s [%message "malformed auth string" ~_:(exn : exn)]
+             |> Error.to_string_hum))
     in
     Arg.conv (parse, Danbooru_lib.Auth.pp)
   in

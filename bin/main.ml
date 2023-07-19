@@ -110,7 +110,7 @@ let tree_cmd =
   let main (danbooru : (module Danbooru_lib.Danbooru.S)) roots =
     let open (val danbooru) in
     let open Deferred.Or_error.Let_syntax in
-    Deferred.Or_error.List.iter roots ~f:(fun root ->
+    Deferred.Or_error.List.iter roots ~how:`Sequential ~f:(fun root ->
       let%bind tree = Tree.get root in
       Tree.save_all tree)
   in

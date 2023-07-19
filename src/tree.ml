@@ -25,7 +25,7 @@ module Make (Config : Config.S) (Downloader : Downloader.S) = struct
     let open Deferred.Or_error.Let_syntax in
     let%bind json = json in
     let%bind child_ids = read_child_ids json |> Deferred.return in
-    let%bind children = Deferred.Or_error.List.map child_ids ~f:get in
+    let%bind children = Deferred.Or_error.List.map child_ids ~how:`Sequential ~f:get in
     return { id; children }
   ;;
 

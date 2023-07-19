@@ -3,12 +3,12 @@ open! Async
 include Config_intf
 
 let create
-      ?(which_server = default_which_server)
-      ~output_dir
-      ~log_level
-      ~auth
-      ~max_concurrent_jobs
-      ()
+  ?(which_server = default_which_server)
+  ~output_dir
+  ~log_level
+  ~auth
+  ~max_concurrent_jobs
+  ()
   =
   let log =
     let output = [ Log.Output.stdout () ] in
