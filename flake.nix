@@ -1,6 +1,5 @@
 {
-  description =
-    "A simple tool for downloading posts from danbooru image boards";
+  description = "A simple tool for downloading posts from danbooru image boards";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
@@ -9,20 +8,32 @@
     ocaml-overlays.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, flake-utils, nixpkgs, ocaml-overlays }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      flake-utils,
+      nixpkgs,
+      ocaml-overlays,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs {
           inherit system;
           overlays = [ ocaml-overlays.overlays.default ];
         };
-      in with pkgs;
-      let ocamlPackages = ocaml-ng.ocamlPackages_4_14;
-      in rec {
+      in
+      with pkgs;
+      let
+        ocamlPackages = ocaml-ng.ocamlPackages_5_4;
+      in
+      rec {
         devShells.default = mkShell {
           inputsFrom = [ packages.default ];
-          buildInputs = packages.default.checkInputs
-            ++ lib.optional stdenv.isLinux inotify-tools ++ [
+          buildInputs =
+            packages.default.checkInputs
+            ++ lib.optional stdenv.isLinux inotify-tools
+            ++ [
               ocamlPackages.merlin
               ocamlformat
               ocamlPackages.ocp-indent
@@ -49,7 +60,8 @@
             expect_test_helpers_core
           ];
           passthru.checkInputs = checkInputs;
-          meta = { homepage = "https://github.com/bcc32/danbooru-tool"; };
+          meta.homepage = "https://github.com/bcc32/danbooru-tool";
         };
-      });
+      }
+    );
 }
